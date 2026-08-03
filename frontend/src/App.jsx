@@ -1,25 +1,37 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          {/* Add more routes here later */}
-          <Route path="projects" element={<Projects />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="calendar" element={<div className="p-6">Calendar Page Placeholder</div>} />
-          <Route path="analytics" element={<div className="p-6">Analytics Page Placeholder</div>} />
-          <Route path="settings" element={<div className="p-6">Settings Page Placeholder</div>} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="projects" element={<Projects />} />
+              <Route path="tasks" element={<Tasks />} />
+              <Route path="calendar" element={<div className="p-6">Calendar Page Placeholder</div>} />
+              <Route path="analytics" element={<div className="p-6">Analytics Page Placeholder</div>} />
+              <Route path="settings" element={<div className="p-6">Settings Page Placeholder</div>} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
