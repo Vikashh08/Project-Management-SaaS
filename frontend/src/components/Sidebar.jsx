@@ -9,7 +9,6 @@ const navItems = [
   { icon: CheckSquare, label: 'Tasks', to: '/tasks' },
   { icon: Users, label: 'Teams', to: '/teams' },
   { icon: Calendar, label: 'Calendar', to: '/calendar' },
-  { icon: BarChart3, label: 'Analytics', to: '/analytics' },
   { icon: Settings, label: 'Settings', to: '/settings' },
 ];
 

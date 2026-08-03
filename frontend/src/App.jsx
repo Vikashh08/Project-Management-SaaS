@@ -6,6 +6,9 @@ import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
+import Teams from './pages/Teams';
+import Calendar from './pages/Calendar';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { Toaster } from 'react-hot-toast';
@@ -30,9 +33,9 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="projects" element={<Projects />} />
               <Route path="tasks" element={<Tasks />} />
-              <Route path="calendar" element={<div className="p-6">Calendar Page Placeholder</div>} />
-              <Route path="analytics" element={<div className="p-6">Analytics Page Placeholder</div>} />
-              <Route path="settings" element={<div className="p-6">Settings Page Placeholder</div>} />
+              <Route path="teams" element={<Teams />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Route>
         </Routes>
