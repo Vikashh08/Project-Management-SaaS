@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SocketProvider } from './context/SocketContext';
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <SocketProvider>
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
@@ -35,6 +37,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+        </SocketProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
