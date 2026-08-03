@@ -4,6 +4,7 @@ import { Plus, MoreHorizontal, MessageSquare, Paperclip, Folder } from 'lucide-r
 import api from '../utils/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import TaskModal from '../components/TaskModal';
 
 const columns = [
   { id: 'TODO', title: 'To Do', color: 'bg-gray-200 dark:bg-gray-700' },
@@ -26,9 +27,9 @@ const PriorityBadge = ({ priority }) => {
   );
 };
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({ task, onClick }) => {
   return (
-    <div className="saas-card p-4 mb-3 cursor-grab active:cursor-grabbing group">
+    <div className="saas-card p-4 mb-3 cursor-grab active:cursor-grabbing group" onClick={onClick}>
       <div className="flex justify-between items-start mb-3">
         <PriorityBadge priority={task.priority} />
         <button className="text-text-muted hover:text-text-color opacity-0 group-hover:opacity-100 transition-opacity">
@@ -64,6 +65,7 @@ const Tasks = () => {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   
   const [newTask, setNewTask] = useState({ 
     title: '', 
@@ -216,7 +218,7 @@ const Tasks = () => {
                         whileHover={{ scale: 1.02 }}
                         layout
                       >
-                        <TaskCard task={task} />
+                        <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
                       </motion.div>
                     ))}
                 </motion.div>
@@ -225,6 +227,12 @@ const Tasks = () => {
           </div>
         ))}
       </div>
+
+      <TaskModal 
+        isOpen={!!selectedTaskId} 
+        onClose={() => setSelectedTaskId(null)} 
+        taskId={selectedTaskId} 
+      />
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

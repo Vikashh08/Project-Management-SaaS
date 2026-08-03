@@ -171,6 +171,76 @@ const deleteTask = async (req, res, next) => {
     next(error);
   }
 };
+// @desc    Add comment to a task
+// @route   POST /api/tasks/:id/comments
+// @access  Private
+const addComment = async (req, res, next) => {
+  try {
+    const { content } = req.body;
+    if (!content) {
+      res.status(400);
+      throw new Error('Comment content is required');
+    }
+
+    const comment = await prisma.comment.create({
+      data: {
+        content,
+        taskId: req.params.id,
+        authorId: req.user.id
+      },
+      include: {
+        author: { select: { id: true, name: true, avatarUrl: true } }
+      }
+    });
+
+    res.status(201).json(comment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Add a subtask
+// @route   POST /api/tasks/:id/subtasks
+// @access  Private
+const addSubtask = async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    if (!title) {
+      res.status(400);
+      throw new Error('Subtask title is required');
+    }
+
+    const subtask = await prisma.subtask.create({
+      data: {
+        title,
+        taskId: req.params.id,
+        isCompleted: false
+      }
+    });
+
+    res.status(201).json(subtask);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Toggle subtask completion
+// @route   PUT /api/tasks/:id/subtasks/:subtaskId
+// @access  Private
+const toggleSubtask = async (req, res, next) => {
+  try {
+    const { isCompleted } = req.body;
+    
+    const subtask = await prisma.subtask.update({
+      where: { id: req.params.subtaskId },
+      data: { isCompleted }
+    });
+
+    res.json(subtask);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   createTask,
@@ -178,4 +248,7 @@ module.exports = {
   getTaskById,
   updateTask,
   deleteTask,
+  addComment,
+  addSubtask,
+  toggleSubtask,
 };

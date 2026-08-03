@@ -5,6 +5,9 @@ const {
   getTaskById,
   updateTask,
   deleteTask,
+  addComment,
+  addSubtask,
+  toggleSubtask,
 } = require('../controllers/taskController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -18,5 +21,14 @@ router.route('/:id')
   .get(protect, getTaskById)
   .put(protect, updateTask)
   .delete(protect, deleteTask);
+
+router.route('/:id/comments')
+  .post(protect, addComment);
+
+router.route('/:id/subtasks')
+  .post(protect, addSubtask);
+
+router.route('/:id/subtasks/:subtaskId')
+  .put(protect, toggleSubtask);
 
 module.exports = router;
