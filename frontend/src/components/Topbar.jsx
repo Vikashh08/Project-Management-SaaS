@@ -1,23 +1,28 @@
 import React from 'react';
 import { Search, Bell, Menu } from 'lucide-react';
 
-const Topbar = () => {
+const Topbar = ({ onMenuClick, onSearchClick }) => {
   return (
-    <header className="h-16 bg-surface-color border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
+    <header className="h-16 bg-surface-color border-b border-border-color flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
       <div className="flex items-center flex-1">
-        <button className="md:hidden p-2 -ml-2 mr-2 text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+        <button 
+          onClick={onMenuClick}
+          className="md:hidden p-2 -ml-2 mr-2 text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+        >
           <Menu className="w-5 h-5" />
         </button>
         
-        <div className="hidden md:flex relative max-w-md w-full">
+        <div className="hidden md:flex relative max-w-md w-full cursor-text" onClick={onSearchClick}>
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-gray-400" />
           </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700 text-sm placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            placeholder="Search projects, tasks, or users (Ctrl+K)"
-          />
+          <div className="flex items-center w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <span>Search projects, tasks, or users...</span>
+            <div className="ml-auto flex items-center space-x-1">
+              <span className="bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded shadow-sm text-xs font-medium">Cmd</span>
+              <span className="bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded shadow-sm text-xs font-medium">K</span>
+            </div>
+          </div>
         </div>
       </div>
       

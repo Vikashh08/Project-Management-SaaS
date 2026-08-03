@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,7 +31,7 @@ ChartJS.register(
 );
 
 const DashboardCard = ({ title, value, icon: Icon, colorClass }) => (
-  <div className="bg-surface-color p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+  <div className="saas-card p-5 flex items-center justify-between">
     <div>
       <h3 className="text-text-muted text-sm font-medium mb-1">{title}</h3>
       <p className="text-3xl font-bold text-text-color">{value}</p>
@@ -104,63 +105,86 @@ const Dashboard = () => {
     return <div className="p-6 text-text-muted">Loading dashboard...</div>;
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="p-6 h-full overflow-y-auto">
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="p-6 h-full overflow-y-auto"
+    >
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-color">Welcome back, {user?.name?.split(' ')[0]}! 👋</h1>
-        <p className="text-text-muted mt-1">Here's what's happening with your projects today.</p>
+        <h1 className="text-3xl font-bold text-text-color tracking-tight">Welcome back, {user?.name?.split(' ')[0]}! 👋</h1>
+        <p className="text-text-muted mt-2 text-lg">Here's what's happening with your projects today.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <DashboardCard 
-          title="Total Projects" 
-          value={stats?.totalProjects || 0} 
-          icon={LayoutDashboard} 
-          colorClass="bg-blue-100 text-blue-600 dark:bg-blue-900/30" 
-        />
-        <DashboardCard 
-          title="Active Projects" 
-          value={stats?.activeProjects || 0} 
-          icon={TrendingUp} 
-          colorClass="bg-purple-100 text-purple-600 dark:bg-purple-900/30" 
-        />
-        <DashboardCard 
-          title="Total Tasks" 
-          value={stats?.totalTasks || 0} 
-          icon={CheckSquare} 
-          colorClass="bg-green-100 text-green-600 dark:bg-green-900/30" 
-        />
-        <DashboardCard 
-          title="Completion Rate" 
-          value={`${stats?.completionRate || 0}%`} 
-          icon={Clock} 
-          colorClass="bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30" 
-        />
+        <motion.div variants={itemVariants}>
+          <DashboardCard 
+            title="Total Projects" 
+            value={stats?.totalProjects || 0} 
+            icon={LayoutDashboard} 
+            colorClass="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light" 
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <DashboardCard 
+            title="Active Projects" 
+            value={stats?.activeProjects || 0} 
+            icon={TrendingUp} 
+            colorClass="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" 
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <DashboardCard 
+            title="Total Tasks" 
+            value={stats?.totalTasks || 0} 
+            icon={CheckSquare} 
+            colorClass="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" 
+          />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <DashboardCard 
+            title="Completion Rate" 
+            value={`${stats?.completionRate || 0}%`} 
+            icon={Clock} 
+            colorClass="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" 
+          />
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-surface-color p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <h3 className="text-lg font-bold text-text-color mb-4">Task Completion Trends</h3>
+        <motion.div variants={itemVariants} className="lg:col-span-2 saas-card p-6">
+          <h3 className="text-xl font-bold text-text-color mb-6">Task Completion Trends</h3>
           <div className="h-[300px] flex items-center justify-center">
             <Line data={lineChartData} options={lineChartOptions} />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-surface-color p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col">
-          <h3 className="text-lg font-bold text-text-color mb-4">Current Task Status</h3>
+        <motion.div variants={itemVariants} className="saas-card p-6 flex flex-col">
+          <h3 className="text-xl font-bold text-text-color mb-6">Current Task Status</h3>
           <div className="flex-1 flex items-center justify-center relative">
             <div className="h-[250px] w-full flex items-center justify-center">
               <Doughnut data={donutData} options={donutOptions} />
             </div>
             {/* Inner Text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
-              <span className="text-3xl font-bold text-text-color">{stats?.totalTasks || 0}</span>
-              <span className="text-xs text-text-muted">Total Tasks</span>
+              <span className="text-4xl font-extrabold text-text-color">{stats?.totalTasks || 0}</span>
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wider mt-1">Total Tasks</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

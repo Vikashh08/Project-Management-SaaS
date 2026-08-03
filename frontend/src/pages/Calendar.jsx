@@ -46,7 +46,7 @@ const Calendar = () => {
         </div>
         <div className="flex space-x-2">
           <button className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-text-color rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Today</button>
-          <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">Add Event</button>
+          <button onClick={() => { import('react-hot-toast').then(m => m.default('Use the Tasks board to add events!')); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">Add Event</button>
         </div>
       </div>
 

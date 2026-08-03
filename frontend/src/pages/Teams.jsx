@@ -23,7 +23,7 @@ const Teams = () => {
           <h1 className="text-2xl font-bold text-text-color">Team Directory</h1>
           <p className="text-text-muted text-sm mt-1">Manage your organization's members</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors">
+        <button onClick={() => { import('react-hot-toast').then(m => m.default('Invite functionality coming in v2!')); }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors">
           <Plus className="w-4 h-4 mr-2" />
           Invite Member
         </button>

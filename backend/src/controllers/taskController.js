@@ -7,9 +7,37 @@ const createTask = async (req, res, next) => {
   try {
     const { title, description, priority, status, dueDate, projectId, estimatedHours } = req.body;
 
-    if (!title || !projectId) {
+    if (!title) {
       res.status(400);
-      throw new Error('Please provide task title and project ID');
+      throw new Error('Please provide a task title');
+    }
+
+    let finalProjectId = projectId;
+
+    if (!finalProjectId || finalProjectId === 'temp_project_id') {
+      let userProject = await prisma.project.findFirst({
+        where: { ownerId: req.user.id }
+      });
+      
+      if (!userProject) {
+         // Create a default org and project if none exists
+         let orgMember = await prisma.organizationMember.findFirst({ where: { userId: req.user.id } });
+         let orgId = orgMember ? orgMember.organizationId : null;
+         
+         if (!orgId) {
+            const newOrg = await prisma.organization.create({
+              data: { name: `${req.user.name}'s Organization`, ownerId: req.user.id, members: { create: { userId: req.user.id, role: 'ORG_ADMIN' } } }
+            });
+            orgId = newOrg.id;
+         }
+         
+         const newProject = await prisma.project.create({
+           data: { name: 'Default Project', ownerId: req.user.id, organizationId: orgId }
+         });
+         finalProjectId = newProject.id;
+      } else {
+         finalProjectId = userProject.id;
+      }
     }
 
     const task = await prisma.task.create({
@@ -20,8 +48,8 @@ const createTask = async (req, res, next) => {
         status: status || 'TODO',
         dueDate: dueDate ? new Date(dueDate) : null,
         estimatedHours,
-        projectId,
         reporterId: req.user.id,
+        projectId: finalProjectId,
       },
     });
 

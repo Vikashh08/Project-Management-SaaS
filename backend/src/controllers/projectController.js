@@ -7,13 +7,38 @@ const createProject = async (req, res, next) => {
   try {
     const { name, description, color, tags, visibility, organizationId } = req.body;
 
-    // Validate required fields
-    if (!name || !organizationId) {
+    if (!name) {
       res.status(400);
-      throw new Error('Please provide project name and organization ID');
+      throw new Error('Please provide project name');
     }
 
-    // Optional: check if user belongs to this org (omitted for brevity, assume valid for now)
+    let finalOrgId = organizationId;
+
+    // Robust MVP fallback: if they use a temp ID or missing ID, find or create their personal org
+    if (!finalOrgId || finalOrgId === 'temp_org_id') {
+      let userMember = await prisma.organizationMember.findFirst({
+        where: { userId: req.user.id },
+      });
+      
+      if (!userMember) {
+        // Auto-create a personal organization for the user
+        const newOrg = await prisma.organization.create({
+          data: {
+            name: `${req.user.name}'s Organization`,
+            ownerId: req.user.id,
+            members: {
+              create: {
+                userId: req.user.id,
+                role: 'ORG_ADMIN'
+              }
+            }
+          }
+        });
+        finalOrgId = newOrg.id;
+      } else {
+        finalOrgId = userMember.organizationId;
+      }
+    }
     
     const project = await prisma.project.create({
       data: {
@@ -23,7 +48,7 @@ const createProject = async (req, res, next) => {
         tags: tags || [],
         visibility: visibility || 'PRIVATE',
         ownerId: req.user.id,
-        organizationId,
+        organizationId: finalOrgId,
       },
     });
 

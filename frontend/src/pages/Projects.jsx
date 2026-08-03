@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Folder, MoreVertical } from 'lucide-react';
 import api from '../utils/api';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 const StatusBadge = ({ status }) => {
@@ -19,10 +20,10 @@ const StatusBadge = ({ status }) => {
 
 const ProjectCard = ({ project }) => {
   return (
-    <div className="bg-surface-color p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow cursor-pointer">
+    <div className="saas-card p-5 h-full flex flex-col cursor-pointer group">
       <div className="flex justify-between items-start mb-4">
-        <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
-          <Folder className="w-5 h-5" />
+        <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-light group-hover:scale-110 transition-transform duration-300">
+          <Folder className="w-6 h-6" />
         </div>
         <button className="text-gray-400 hover:text-gray-600">
           <MoreVertical className="w-5 h-5" />
@@ -100,11 +101,23 @@ const Projects = () => {
       ) : projects?.length === 0 ? (
         <div className="text-center py-20 text-text-muted">No projects found. Create one!</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
           {projects?.map(project => (
-            <ProjectCard key={project.id} project={project} />
+            <motion.div 
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <ProjectCard project={project} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {showModal && (
@@ -130,18 +143,6 @@ const Projects = () => {
                     onChange={(e) => setNewProject({...newProject, description: e.target.value})}
                     className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
                   ></textarea>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Organization ID</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newProject.organizationId}
-                    onChange={(e) => setNewProject({...newProject, organizationId: e.target.value})}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
-                    placeholder="Enter valid Org ID from DB"
-                  />
-                  <p className="text-xs text-text-muted mt-1">Requires a valid Organization ID from the DB.</p>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

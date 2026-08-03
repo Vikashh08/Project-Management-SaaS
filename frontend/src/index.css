@@ -1,17 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-background: #f8fafc;
-  --color-surface: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Classic SaaS Indigo Primary */
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-primary-light: #818cf8;
   
-  --color-dark-background: #0f172a;
-  --color-dark-surface: #1e293b;
-  --color-dark-text: #f8fafc;
-  --color-dark-text-muted: #94a3b8;
+  /* Crisp Light Mode */
+  --color-background: #f4f4f5; /* Ultra light gray canvas */
+  --color-surface: #ffffff; /* Pure white cards */
+  --color-text: #09090b; /* High contrast black/gray */
+  --color-text-muted: #52525b; /* Medium gray */
+  --color-border: #e4e4e7; /* Sharp 1px gray border */
+  
+  /* Sleek Dark Mode (Linear inspired) */
+  --color-dark-background: #09090b;
+  --color-dark-surface: #121212;
+  --color-dark-text: #fafafa;
+  --color-dark-text-muted: #a1a1aa;
+  --color-dark-border: #27272a;
+
+  /* Tailwind CSS Utility Aliases */
+  --color-bg-color: var(--bg-color);
+  --color-surface-color: var(--surface-color);
+  --color-text-color: var(--text-color);
+  --color-text-muted: var(--text-muted);
+  --color-border-color: var(--border-color);
 }
 
 @layer base {
@@ -20,6 +36,7 @@
     --surface-color: var(--color-surface);
     --text-color: var(--color-text);
     --text-muted: var(--color-text-muted);
+    --border-color: var(--color-border);
   }
 
   .dark {
@@ -27,10 +44,20 @@
     --surface-color: var(--color-dark-surface);
     --text-color: var(--color-dark-text);
     --text-muted: var(--color-dark-text-muted);
+    --border-color: var(--color-dark-border);
   }
 
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .saas-card {
+    @apply bg-surface-color border border-border-color rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
   }
 }
