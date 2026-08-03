@@ -122,8 +122,45 @@ const getUserProfile = async (req, res, next) => {
   }
 };
 
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateUserProfile = async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+
+    if (user) {
+      const updatedUser = await prisma.user.update({
+        where: { id: req.user.id },
+        data: {
+          name: req.body.name || user.name,
+          email: req.body.email || user.email,
+          avatarUrl: req.body.avatarUrl || user.avatarUrl,
+        },
+      });
+
+      res.json({
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        avatarUrl: updatedUser.avatarUrl,
+        token: generateToken(updatedUser.id),
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUserProfile,
+  updateUserProfile,
 };

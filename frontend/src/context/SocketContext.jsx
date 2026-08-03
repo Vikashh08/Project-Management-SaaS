@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000'); // Use env var in prod
+      const newSocket = io('http://localhost:5001'); // Use env var in prod
 
       newSocket.on('connect', () => {
         newSocket.emit('setup', user.id);

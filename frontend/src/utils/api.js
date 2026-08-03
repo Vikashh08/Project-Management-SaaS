@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // During dev. Use relative for prod if served together
+  baseURL: 'http://localhost:5001/api', // During dev. Use relative for prod if served together
 });
 
 // Add a request interceptor to inject the JWT token

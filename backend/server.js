@@ -32,6 +32,7 @@ app.use('/api/tasks', require('./src/routes/taskRoutes'));
 app.use('/api/notifications', require('./src/routes/notificationRoutes'));
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/analytics', require('./src/routes/analyticsRoutes'));
+app.use('/api/teams', require('./src/routes/teamRoutes'));
 
 // Error Handling Middleware
 app.use(notFound);
@@ -40,7 +41,7 @@ app.use(errorHandler);
 const http = require('http');
 const { initializeSocket } = require('./src/utils/socket');
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5001; // Hardcoded to bypass macOS port 5000 conflict
 const server = http.createServer(app);
 
 // Initialize Socket.io
