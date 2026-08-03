@@ -1,13 +1,399 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+enum Role {
+  SUPER_ADMIN
+  ORG_ADMIN
+  PROJECT_MANAGER
+  TEAM_LEAD
+  DEVELOPER
+  QA_TESTER
+  CLIENT
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+}
+
+enum Visibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  TESTING
+  BLOCKED
+  DONE
+}
+
+enum BookmarkType {
+  PROJECT
+  TASK
+}
+
+// -----------------------------------------------------------------------------
+// MODELS
+// -----------------------------------------------------------------------------
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  name            String
+  avatarUrl       String?
+  bio             String?
+  skills          String[]
+  experience      String?
+  role            Role     @default(VIEWER)
+  status          UserStatus @default(ACTIVE)
+  isVerified      Boolean  @default(false)
+  lastLogin       DateTime?
+  
+  // Relations
+  ownedOrgs       Organization[]       @relation("OrgOwner")
+  orgMemberships  OrganizationMember[]
+  teamMemberships TeamMember[]
+  projectMemberships ProjectMember[]
+  ownedProjects   Project[]            @relation("ProjectOwner")
+  reportedTasks   Task[]               @relation("TaskReporter")
+  assignedTasks   TaskAssignee[]
+  comments        Comment[]
+  attachments     Attachment[]
+  notifications   Notification[]
+  activityLogs    ActivityLog[]
+  timeLogs        TimeLog[]
+  bookmarks       Bookmark[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Organization {
+  id              String   @id @default(uuid())
+  name            String
+  logo            String?
+  billingStatus   String   @default("FREE")
+  ownerId         String
+  owner           User     @relation("OrgOwner", fields: [ownerId], references: [id])
+  
+  members         OrganizationMember[]
+  teams           Team[]
+  projects        Project[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model OrganizationMember {
+  id              String   @id @default(uuid())
+  userId          String
+  organizationId  String
+  role            Role     @default(VIEWER)
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  joinedAt        DateTime @default(now())
+
+  @@unique([userId, organizationId])
+}
+
+model Team {
+  id              String   @id @default(uuid())
+  name            String
+  avatarUrl       String?
+  organizationId  String
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members         TeamMember[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model TeamMember {
+  id              String   @id @default(uuid())
+  userId          String
+  teamId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  joinedAt        DateTime @default(now())
+
+  @@unique([userId, teamId])
+}
+
+model Project {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  logo            String?
+  color           String?
+  status          ProjectStatus @default(ACTIVE)
+  startDate       DateTime?
+  deadline        DateTime?
+  priority        TaskPriority  @default(MEDIUM)
+  tags            String[]
+  visibility      Visibility    @default(PRIVATE)
+  
+  ownerId         String
+  organizationId  String
+  
+  owner           User          @relation("ProjectOwner", fields: [ownerId], references: [id])
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  members         ProjectMember[]
+  tasks           Task[]
+  labels          Label[]
+  attachments     Attachment[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProjectMember {
+  id              String   @id @default(uuid())
+  userId          String
+  projectId       String
+  role            Role     @default(VIEWER)
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  joinedAt        DateTime @default(now())
+
+  @@unique([userId, projectId])
+}
+
+model Task {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  priority        TaskPriority @default(MEDIUM)
+  status          TaskStatus   @default(TODO)
+  dueDate         DateTime?
+  estimatedHours  Float?
+  actualHours     Float?
+  coverImage      String?
+  
+  projectId       String
+  reporterId      String
+  
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reporter        User     @relation("TaskReporter", fields: [reporterId], references: [id])
+  
+  assignees       TaskAssignee[]
+  subtasks        Subtask[]
+  checklists      Checklist[]
+  comments        Comment[]
+  attachments     Attachment[]
+  timeLogs        TimeLog[]
+  labels          TaskLabel[]
+  
+  dependencies    TaskDependency[] @relation("TaskSuccessor")
+  dependentOn     TaskDependency[] @relation("TaskPredecessor")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model TaskAssignee {
+  id              String   @id @default(uuid())
+  userId          String
+  taskId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  assignedAt      DateTime @default(now())
+
+  @@unique([userId, taskId])
+}
+
+model TaskDependency {
+  id              String   @id @default(uuid())
+  predecessorId   String
+  successorId     String
+  type            String   @default("BLOCKS") // e.g. BLOCKS, IS_BLOCKED_BY
+  
+  predecessor     Task     @relation("TaskPredecessor", fields: [predecessorId], references: [id], onDelete: Cascade)
+  successor       Task     @relation("TaskSuccessor", fields: [successorId], references: [id], onDelete: Cascade)
+
+  @@unique([predecessorId, successorId])
+}
+
+model Subtask {
+  id              String   @id @default(uuid())
+  title           String
+  isCompleted     Boolean  @default(false)
+  taskId          String
+  
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Checklist {
+  id              String   @id @default(uuid())
+  title           String
+  taskId          String
+  
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  items           ChecklistItem[]
+
+  createdAt       DateTime @default(now())
+}
+
+model ChecklistItem {
+  id              String   @id @default(uuid())
+  content         String
+  isCompleted     Boolean  @default(false)
+  checklistId     String
+  
+  checklist       Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  content         String
+  authorId        String
+  taskId          String?
+  parentId        String?  // For nested replies
+  
+  author          User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  task            Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  parent          Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies         Comment[] @relation("CommentReplies")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Attachment {
+  id              String   @id @default(uuid())
+  url             String
+  filename        String
+  size            Int
+  type            String
+  uploaderId      String
+  taskId          String?
+  projectId       String?
+  
+  uploader        User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  task            Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+}
+
+model Notification {
+  id              String   @id @default(uuid())
+  type            String   // TASK_ASSIGNED, MENTION, etc.
+  content         String
+  isRead          Boolean  @default(false)
+  link            String?
+  userId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+}
+
+model ActivityLog {
+  id              String   @id @default(uuid())
+  action          String
+  entityType      String   // TASK, PROJECT, USER, etc.
+  entityId        String
+  details         String?  // JSON stringified details
+  userId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+}
+
+model Label {
+  id              String   @id @default(uuid())
+  name            String
+  color           String
+  projectId       String
+  
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks           TaskLabel[]
+
+  createdAt       DateTime @default(now())
+}
+
+model TaskLabel {
+  id              String   @id @default(uuid())
+  taskId          String
+  labelId         String
+  
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label           Label    @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, labelId])
+}
+
+model TimeLog {
+  id              String   @id @default(uuid())
+  startTime       DateTime
+  endTime         DateTime?
+  durationMinutes Int?
+  description     String?
+  
+  userId          String
+  taskId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Bookmark {
+  id              String   @id @default(uuid())
+  type            BookmarkType
+  entityId        String
+  userId          String
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, type, entityId])
 }
