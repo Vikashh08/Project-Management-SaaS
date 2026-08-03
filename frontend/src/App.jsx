@@ -9,10 +9,14 @@ import Tasks from './pages/Tasks';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
@@ -31,7 +35,8 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
