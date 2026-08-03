@@ -30,6 +30,8 @@ app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/projects', require('./src/routes/projectRoutes'));
 app.use('/api/tasks', require('./src/routes/taskRoutes'));
 app.use('/api/notifications', require('./src/routes/notificationRoutes'));
+app.use('/api/upload', require('./src/routes/uploadRoutes'));
+app.use('/api/analytics', require('./src/routes/analyticsRoutes'));
 
 // Error Handling Middleware
 app.use(notFound);
