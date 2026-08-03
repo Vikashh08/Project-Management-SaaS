@@ -27,6 +27,8 @@ app.get('/', (req, res) => {
 
 // Setup API routes here
 app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/projects', require('./src/routes/projectRoutes'));
+app.use('/api/tasks', require('./src/routes/taskRoutes'));
 
 // Error Handling Middleware
 app.use(notFound);
