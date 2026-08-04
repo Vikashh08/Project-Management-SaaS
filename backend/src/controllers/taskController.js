@@ -140,7 +140,17 @@ const updateTask = async (req, res, next) => {
         estimatedHours, 
         actualHours 
       },
+      include: {
+        assignees: { include: { user: { select: { id: true, name: true, avatarUrl: true } } } },
+        reporter: { select: { id: true, name: true, avatarUrl: true } }
+      }
     });
+
+    try {
+      getIo().to(`project_${task.projectId}`).emit('TASK_UPDATED', task);
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
 
     res.json(task);
   } catch (error) {
@@ -166,6 +176,12 @@ const deleteTask = async (req, res, next) => {
       where: { id: req.params.id }
     });
 
+    try {
+      getIo().to(`project_${task.projectId}`).emit('TASK_DELETED', { id: task.id });
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
+
     res.json({ message: 'Task removed' });
   } catch (error) {
     next(error);
@@ -189,9 +205,16 @@ const addComment = async (req, res, next) => {
         authorId: req.user.id
       },
       include: {
-        author: { select: { id: true, name: true, avatarUrl: true } }
+        author: { select: { id: true, name: true, avatarUrl: true } },
+        task: { select: { projectId: true } }
       }
     });
+
+    try {
+      getIo().to(`project_${comment.task.projectId}`).emit('TASK_UPDATED', { id: req.params.id });
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
 
     res.status(201).json(comment);
   } catch (error) {
@@ -214,9 +237,17 @@ const addSubtask = async (req, res, next) => {
       data: {
         title,
         taskId: req.params.id,
-        isCompleted: false
+      },
+      include: {
+        task: { select: { projectId: true } }
       }
     });
+
+    try {
+      getIo().to(`project_${subtask.task.projectId}`).emit('TASK_UPDATED', { id: req.params.id });
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
 
     res.status(201).json(subtask);
   } catch (error) {
@@ -233,8 +264,17 @@ const toggleSubtask = async (req, res, next) => {
     
     const subtask = await prisma.subtask.update({
       where: { id: req.params.subtaskId },
-      data: { isCompleted }
+      data: { isCompleted },
+      include: {
+        task: { select: { projectId: true } }
+      }
     });
+
+    try {
+      getIo().to(`project_${subtask.task.projectId}`).emit('TASK_UPDATED', { id: subtask.taskId });
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
 
     res.json(subtask);
   } catch (error) {
@@ -248,7 +288,10 @@ const toggleSubtask = async (req, res, next) => {
 const deleteAttachment = async (req, res, next) => {
   try {
     const attachment = await prisma.attachment.findUnique({
-      where: { id: req.params.attachmentId }
+      where: { id: req.params.attachmentId },
+      include: {
+        task: { select: { projectId: true } }
+      }
     });
 
     if (!attachment) {
@@ -260,6 +303,14 @@ const deleteAttachment = async (req, res, next) => {
     await prisma.attachment.delete({
       where: { id: req.params.attachmentId }
     });
+
+    try {
+      if (attachment.task && attachment.task.projectId) {
+        getIo().to(`project_${attachment.task.projectId}`).emit('TASK_UPDATED', { id: attachment.taskId });
+      }
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
 
     res.json({ message: 'Attachment deleted' });
   } catch (error) {

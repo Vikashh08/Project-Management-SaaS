@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useSocket } from '../context/SocketContext';
 import { X, MessageSquare, CheckSquare, Clock, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
@@ -91,6 +92,29 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
       toast.success('Attachment removed');
     }
   });
+
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (socket && taskId && isOpen) {
+      const handleTaskUpdate = (data) => {
+        if (data && data.id === taskId) {
+          queryClient.invalidateQueries(['task', taskId]);
+        } else if (!data) {
+          // If no data id is passed, just invalidate anyway to be safe
+          queryClient.invalidateQueries(['task', taskId]);
+        }
+      };
+
+      socket.on('TASK_UPDATED', handleTaskUpdate);
+      socket.on('TASK_DELETED', handleTaskUpdate);
+
+      return () => {
+        socket.off('TASK_UPDATED', handleTaskUpdate);
+        socket.off('TASK_DELETED', handleTaskUpdate);
+      };
+    }
+  }, [socket, taskId, isOpen, queryClient]);
 
   if (!isOpen) return null;
 

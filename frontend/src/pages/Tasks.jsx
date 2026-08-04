@@ -5,6 +5,7 @@ import api from '../utils/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import TaskModal from '../components/TaskModal';
+import { useSocket } from '../context/SocketContext';
 
 const columns = [
   { id: 'TODO', title: 'To Do', color: 'bg-gray-200 dark:bg-gray-700' },
@@ -75,6 +76,8 @@ const Tasks = () => {
     dueDate: ''
   });
 
+  const { socket } = useSocket();
+
   // Fetch projects to populate dropdowns
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -91,6 +94,27 @@ const Tasks = () => {
       setNewTask(prev => ({ ...prev, projectId: projects[0].id }));
     }
   }, [projects, selectedProjectId]);
+
+  // Handle Socket.IO Real-Time Updates
+  useEffect(() => {
+    if (socket && selectedProjectId) {
+      socket.emit('join_project', selectedProjectId);
+
+      const handleTaskUpdate = () => {
+        queryClient.invalidateQueries(['tasks', selectedProjectId]);
+      };
+
+      socket.on('TASK_CREATED', handleTaskUpdate);
+      socket.on('TASK_UPDATED', handleTaskUpdate);
+      socket.on('TASK_DELETED', handleTaskUpdate);
+
+      return () => {
+        socket.off('TASK_CREATED', handleTaskUpdate);
+        socket.off('TASK_UPDATED', handleTaskUpdate);
+        socket.off('TASK_DELETED', handleTaskUpdate);
+      };
+    }
+  }, [socket, selectedProjectId, queryClient]);
 
   // Fetch tasks filtered by selected project
   const { data: tasks = [], isLoading } = useQuery({

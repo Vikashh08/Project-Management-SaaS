@@ -2,6 +2,7 @@ const express = require('express');
 const { protect } = require('../middleware/authMiddleware');
 const { upload } = require('../utils/cloudinary');
 const prisma = require('../utils/db');
+const { getIo } = require('../utils/socket');
 
 const router = express.Router();
 
@@ -34,7 +35,18 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
         taskId: taskId || null,
         projectId: projectId || null,
       },
+      include: {
+        task: { select: { projectId: true } }
+      }
     });
+
+    if (attachment.task && attachment.task.projectId) {
+      try {
+        getIo().to(`project_${attachment.task.projectId}`).emit('TASK_UPDATED', { id: attachment.taskId });
+      } catch (e) {
+        console.error('Socket error:', e);
+      }
+    }
 
     res.status(201).json({
       message: 'File uploaded successfully',
