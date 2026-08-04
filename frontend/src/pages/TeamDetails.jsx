@@ -7,6 +7,7 @@ import {
   ArrowLeft, Users, CheckCircle2, Clock, TrendingUp, Settings, UserPlus,
   Trash2, X, Search, UserCheck, Star, Mail, Activity, Shield, Plus
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Loader from '../components/Loader';
 import PermissionGate from '../components/PermissionGate';
 import { ProjectCard, ProjectModal } from '../components/ProjectComponents';
@@ -214,25 +215,6 @@ const TeamDetails = () => {
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to remove member'),
   });
 
-  if (isLoading) return <Loader text="Loading team..." />;
-  if (error || !data) return (
-    <div className="p-6 text-center">
-      <p className="text-text-muted">Team not found.</p>
-      <button onClick={() => navigate('/teams')} className="mt-4 saas-button">Go Back</button>
-    </div>
-  );
-
-  const team = data;
-  const stats = data.stats || {};
-  const existingUserIds = new Set(team.members?.map(m => m.userId) || []);
-
-  const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'projects', label: `Projects` },
-    { id: 'members', label: `Members (${team.members?.length || 0})` },
-    { id: 'activity', label: 'Activity' },
-  ];
-
   const { data: teamProjects = [], isLoading: isLoadingProjects } = useQuery({
     queryKey: ['teamProjects', id],
     queryFn: async () => { const { data } = await api.get(`/projects?teamId=${id}`); return data; },
@@ -252,6 +234,25 @@ const TeamDetails = () => {
     },
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to delete'),
   });
+
+  if (isLoading) return <Loader text="Loading team..." />;
+  if (error || !data) return (
+    <div className="p-6 text-center">
+      <p className="text-text-muted">Team not found.</p>
+      <button onClick={() => navigate('/teams')} className="mt-4 saas-button">Go Back</button>
+    </div>
+  );
+
+  const team = data;
+  const stats = data.stats || {};
+  const existingUserIds = new Set(team.members?.map(m => m.userId) || []);
+
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'projects', label: `Projects` },
+    { id: 'members', label: `Members (${team.members?.length || 0})` },
+    { id: 'activity', label: 'Activity' },
+  ];
 
   return (
     <div className="h-full overflow-y-auto">
