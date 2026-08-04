@@ -80,9 +80,11 @@ const Tasks = () => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const initialProjectId = searchParams.get('projectId') || '';
+  const initialTeamId = searchParams.get('teamId') || '';
 
   const [showModal, setShowModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
+  const [teamIdForTasks, setTeamIdForTasks] = useState(initialTeamId);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
   
@@ -134,11 +136,15 @@ const Tasks = () => {
     }
   }, [socket, selectedProjectId, queryClient]);
 
-  // Fetch tasks filtered by selected project
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ['tasks', selectedProjectId],
+    queryKey: ['tasks', selectedProjectId, teamIdForTasks],
     queryFn: async () => {
-      const url = selectedProjectId ? `/tasks?projectId=${selectedProjectId}` : '/tasks';
+      let url = '/tasks';
+      if (selectedProjectId) {
+        url = `/tasks?projectId=${selectedProjectId}`;
+      } else if (teamIdForTasks) {
+        url = `/tasks?teamId=${teamIdForTasks}`;
+      }
       const { data } = await api.get(url);
       return data;
     }
@@ -164,10 +170,10 @@ const Tasks = () => {
       return api.put(`/tasks/${id}`, { status });
     },
     onMutate: async (newTodo) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks', selectedProjectId] });
-      const previousTasks = queryClient.getQueryData(['tasks', selectedProjectId]);
+      await queryClient.cancelQueries({ queryKey: ['tasks', selectedProjectId, teamIdForTasks] });
+      const previousTasks = queryClient.getQueryData(['tasks', selectedProjectId, teamIdForTasks]);
       
-      queryClient.setQueryData(['tasks', selectedProjectId], old => {
+      queryClient.setQueryData(['tasks', selectedProjectId, teamIdForTasks], old => {
         if (!old) return old;
         return old.map(task => 
           task.id === newTodo.id ? { ...task, status: newTodo.status } : task
@@ -177,11 +183,11 @@ const Tasks = () => {
       return { previousTasks };
     },
     onError: (err, newTodo, context) => {
-      queryClient.setQueryData(['tasks', selectedProjectId], context.previousTasks);
+      queryClient.setQueryData(['tasks', selectedProjectId, teamIdForTasks], context.previousTasks);
       toast.error('Failed to move task');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', selectedProjectId] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['project'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
@@ -229,7 +235,7 @@ const Tasks = () => {
             <Folder className="w-4 h-4 text-text-muted" />
             <select 
               value={selectedProjectId}
-              onChange={(e) => setSelectedProjectId(e.target.value)}
+              onChange={(e) => { setSelectedProjectId(e.target.value); setTeamIdForTasks(''); }}
               className="bg-transparent border-none text-sm text-text-muted font-medium focus:ring-0 p-0 cursor-pointer"
             >
               <option value="">All Projects</option>

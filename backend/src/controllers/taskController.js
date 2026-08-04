@@ -83,19 +83,21 @@ const createTask = async (req, res, next) => {
 // @access  Private
 const getTasks = async (req, res, next) => {
   try {
-    const { projectId } = req.query;
+    const { projectId, teamId } = req.query;
 
-    const where = {
-      project: {
+    const where = {};
+    if (projectId) {
+      where.projectId = projectId;
+    } else if (teamId) {
+      where.project = { teamId: teamId };
+    } else {
+      where.project = {
         organization: {
           members: {
             some: { userId: req.user.id }
           }
         }
-      }
-    };
-    if (projectId) {
-      where.projectId = projectId;
+      };
     }
 
     const tasks = await prisma.task.findMany({

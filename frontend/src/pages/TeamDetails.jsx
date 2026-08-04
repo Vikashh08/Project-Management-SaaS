@@ -5,11 +5,11 @@ import api from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Users, CheckCircle2, Clock, TrendingUp, Settings, UserPlus,
-  Trash2, X, Search, UserCheck, Star, Mail, Activity, Shield
+  Trash2, X, Search, UserCheck, Star, Mail, Activity, Shield, Plus
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 import Loader from '../components/Loader';
 import PermissionGate from '../components/PermissionGate';
+import { ProjectCard, ProjectModal } from '../components/ProjectComponents';
 
 // ── Stat Card ──────────────────────────────────────────────────────────────
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -228,9 +228,30 @@ const TeamDetails = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'projects', label: `Projects` },
     { id: 'members', label: `Members (${team.members?.length || 0})` },
     { id: 'activity', label: 'Activity' },
   ];
+
+  const { data: teamProjects = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['teamProjects', id],
+    queryFn: async () => { const { data } = await api.get(`/projects?teamId=${id}`); return data; },
+    enabled: activeTab === 'projects' || activeTab === 'overview'
+  });
+
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [editProject, setEditProject] = useState(null);
+  const [deleteProjectTarget, setDeleteProjectTarget] = useState(null);
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (projectId) => api.delete(`/projects/${projectId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['teamProjects', id]);
+      toast.success('Project deleted');
+      setDeleteProjectTarget(null);
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to delete'),
+  });
 
   return (
     <div className="h-full overflow-y-auto">
@@ -322,10 +343,31 @@ const TeamDetails = () => {
                 <h2 className="text-lg font-bold text-text-color">Team Members</h2>
                 <button onClick={() => setActiveTab('members')} className="text-sm text-primary hover:underline">See all →</button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 mb-8">
                 {team.members?.slice(0, 5).map(m => (
                   <MemberCard key={m.id} member={m} teamColor={team.color} currentUserId={storedUser.id} onRemove={setRemoveTarget} />
                 ))}
+              </div>
+
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-text-color">Team Projects</h2>
+                <button onClick={() => setActiveTab('projects')} className="text-sm text-primary hover:underline">See all →</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teamProjects.length === 0 ? (
+                  <div className="col-span-full saas-card p-6 text-center text-text-muted text-sm">
+                    No projects found for this team.
+                  </div>
+                ) : (
+                  teamProjects.slice(0, 4).map(project => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      onEdit={setEditProject}
+                      onDelete={setDeleteProjectTarget}
+                    />
+                  ))
+                )}
               </div>
             </div>
             {/* Quick info */}
@@ -382,6 +424,45 @@ const TeamDetails = () => {
           </div>
         )}
 
+        {activeTab === 'projects' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-text-color">Team Projects</h2>
+              <div className="flex items-center gap-3">
+                <Link to={`/tasks?teamId=${id}`} className="saas-button bg-surface-color text-text-color border border-border-color hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm py-2">
+                  <CheckCircle2 className="w-4 h-4" /> Team Kanban Board
+                </Link>
+                <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD']}>
+                  <button onClick={() => setShowProjectModal(true)} className="saas-button flex items-center gap-2 text-sm py-2">
+                    <Plus className="w-4 h-4" /> New Project
+                  </button>
+                </PermissionGate>
+              </div>
+            </div>
+            
+            {isLoadingProjects ? <Loader text="Loading projects..." /> : teamProjects.length === 0 ? (
+              <div className="text-center py-20 text-text-muted">No projects found. Create one!</div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ staggerChildren: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              >
+                {teamProjects.map(project => (
+                  <motion.div key={project.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                    <ProjectCard
+                      project={project}
+                      onEdit={setEditProject}
+                      onDelete={setDeleteProjectTarget}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'activity' && (
           <div className="max-w-2xl">
             <h2 className="text-lg font-bold text-text-color mb-4 flex items-center gap-2">
@@ -429,6 +510,52 @@ const TeamDetails = () => {
                   className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium disabled:opacity-60 transition-colors"
                 >
                   {removeMutation.isPending ? 'Removing...' : 'Remove'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showProjectModal && (
+          <ProjectModal teamId={id} onClose={() => setShowProjectModal(false)} onSuccess={() => {
+            queryClient.invalidateQueries(['teamProjects', id]);
+            setShowProjectModal(false);
+          }} />
+        )}
+        {editProject && (
+          <ProjectModal project={editProject} teamId={id} onClose={() => setEditProject(null)} onSuccess={() => {
+            queryClient.invalidateQueries(['teamProjects', id]);
+            setEditProject(null);
+          }} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {deleteProjectTarget && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-surface-color p-6 rounded-2xl w-full max-w-sm shadow-2xl border border-border-color"
+            >
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Delete "{deleteProjectTarget.name}"?</h3>
+              <p className="text-text-muted text-sm mb-6">This will permanently delete the project and all its associated data. This action cannot be undone.</p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setDeleteProjectTarget(null)} className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={() => deleteProjectMutation.mutate(deleteProjectTarget.id)}
+                  disabled={deleteProjectMutation.isPending}
+                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors disabled:opacity-60"
+                >
+                  {deleteProjectMutation.isPending ? 'Deleting...' : 'Yes, Delete'}
                 </button>
               </div>
             </motion.div>

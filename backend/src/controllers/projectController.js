@@ -6,7 +6,7 @@ const { logActivity } = require('../utils/activityLogger');
 // @access  Private
 const createProject = async (req, res, next) => {
   try {
-    const { name, description, color, tags, visibility, organizationId } = req.body;
+    const { name, description, color, tags, visibility, organizationId, teamId } = req.body;
 
     if (!name) {
       res.status(400);
@@ -50,6 +50,7 @@ const createProject = async (req, res, next) => {
         visibility: visibility || 'PRIVATE',
         ownerId: req.user.id,
         organizationId: finalOrgId,
+        teamId: teamId || null,
       },
     });
 
@@ -75,10 +76,12 @@ const createProject = async (req, res, next) => {
 // @access  Private
 const getProjects = async (req, res, next) => {
   try {
-    const { organizationId } = req.query;
+    const { organizationId, teamId } = req.query;
 
     const where = {};
-    if (organizationId) {
+    if (teamId) {
+      where.teamId = teamId;
+    } else if (organizationId) {
       where.organizationId = organizationId;
     } else {
       // If no org specified, fetch projects where user is owner or member
