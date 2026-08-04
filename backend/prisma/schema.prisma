@@ -75,6 +75,9 @@ model User {
   bio             String?
   skills          String[]
   experience      String?
+  github          String?
+  linkedin        String?
+  website         String?
   role            Role     @default(VIEWER)
   status          UserStatus @default(ACTIVE)
   isVerified      Boolean  @default(false)

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Menu } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
+import ProfileDropdown from './ProfileDropdown';
 import { useAuth } from '../context/AuthContext';
 
 const Topbar = ({ onMenuClick, onSearchClick }) => {
@@ -32,12 +33,7 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
       
       <div className="flex items-center space-x-4">
         <NotificationDropdown />
-        
-        <div className="flex items-center space-x-3 border-l border-gray-200 dark:border-gray-700 pl-4">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold overflow-hidden cursor-pointer">
-            <img src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} alt="Profile" className="w-full h-full object-cover" />
-          </div>
-        </div>
+        <ProfileDropdown />
       </div>
     </header>
   );
