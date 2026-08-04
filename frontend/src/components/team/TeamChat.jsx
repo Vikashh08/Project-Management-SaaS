@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 
 const TeamChat = ({ teamId }) => {
   const { user } = useAuth();
-  const socket = useSocket();
+  const { socket } = useSocket();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef(null);
   
