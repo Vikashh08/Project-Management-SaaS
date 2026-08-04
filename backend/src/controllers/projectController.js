@@ -1,4 +1,5 @@
 const prisma = require('../utils/db');
+const { logActivity } = require('../utils/activityLogger');
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -51,6 +52,17 @@ const createProject = async (req, res, next) => {
         organizationId: finalOrgId,
       },
     });
+
+    // Add owner as a project member
+    await prisma.projectMember.create({
+      data: {
+        userId: req.user.id,
+        projectId: project.id,
+        role: 'ORG_ADMIN'
+      }
+    });
+
+    await logActivity(req.user.id, 'CREATED_PROJECT', 'PROJECT', project.id, { projectName: project.name });
 
     res.status(201).json(project);
   } catch (error) {

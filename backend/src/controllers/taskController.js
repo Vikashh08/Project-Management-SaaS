@@ -1,4 +1,6 @@
 const prisma = require('../utils/db');
+const { getIo } = require('../../server');
+const { logActivity } = require('../utils/activityLogger');
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -53,7 +55,23 @@ const createTask = async (req, res, next) => {
       },
     });
 
-    res.status(201).json(task);
+    const taskWithRelations = await prisma.task.findUnique({
+      where: { id: task.id },
+      include: {
+        assignees: { include: { user: { select: { id: true, name: true, avatarUrl: true } } } },
+        reporter: { select: { id: true, name: true, avatarUrl: true } }
+      }
+    });
+
+    try {
+      getIo().to(`project_${finalProjectId}`).emit('TASK_CREATED', taskWithRelations);
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
+    
+    await logActivity(req.user.id, 'CREATED_TASK', 'TASK', task.id, { taskTitle: task.title });
+
+    res.status(201).json(taskWithRelations);
   } catch (error) {
     next(error);
   }
@@ -152,6 +170,12 @@ const updateTask = async (req, res, next) => {
       console.error('Socket error:', e);
     }
 
+    if (status === 'DONE') {
+      await logActivity(req.user.id, 'COMPLETED_TASK', 'TASK', task.id, { taskTitle: task.title });
+    } else {
+      await logActivity(req.user.id, 'UPDATED_TASK', 'TASK', task.id, { taskTitle: task.title });
+    }
+
     res.json(task);
   } catch (error) {
     next(error);
@@ -181,6 +205,8 @@ const deleteTask = async (req, res, next) => {
     } catch (e) {
       console.error('Socket error:', e);
     }
+
+    await logActivity(req.user.id, 'DELETED_TASK', 'PROJECT', task.projectId, { taskTitle: task.title });
 
     res.json({ message: 'Task removed' });
   } catch (error) {
@@ -215,6 +241,8 @@ const addComment = async (req, res, next) => {
     } catch (e) {
       console.error('Socket error:', e);
     }
+
+    await logActivity(req.user.id, 'ADDED_COMMENT', 'TASK', req.params.id, { commentSnippet: content.substring(0, 50) });
 
     res.status(201).json(comment);
   } catch (error) {

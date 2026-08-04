@@ -31,6 +31,7 @@ app.get('/', (req, res) => {
 
 // Setup API routes here
 app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/projects', require('./src/routes/projectRoutes'));
 app.use('/api/tasks', require('./src/routes/taskRoutes'));
 app.use('/api/notifications', require('./src/routes/notificationRoutes'));
@@ -38,6 +39,7 @@ app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/analytics', require('./src/routes/analyticsRoutes'));
 app.use('/api/teams', require('./src/routes/teamRoutes'));
 app.use('/api/search', require('./src/routes/searchRoutes'));
+app.use('/api/invites', require('./src/routes/inviteRoutes'));
 
 // Error Handling Middleware
 app.use(notFound);
