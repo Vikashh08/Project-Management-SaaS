@@ -41,6 +41,7 @@ app.use('/api/teams', require('./src/routes/teamRoutes'));
 app.use('/api/teams/:teamId/sprints', require('./src/routes/sprintRoutes'));
 app.use('/api/search', require('./src/routes/searchRoutes'));
 app.use('/api/invites', require('./src/routes/inviteRoutes'));
+app.use('/api/timelogs', require('./src/routes/timeLogRoutes'));
 
 // Error Handling Middleware
 app.use(notFound);
