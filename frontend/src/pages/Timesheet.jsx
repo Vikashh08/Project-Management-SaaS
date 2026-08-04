@@ -205,7 +205,7 @@ const Timesheet = () => {
   });
 
   const stopMutation = useMutation({
-    mutationFn: (taskId) => api.put(`/timelogs/task/${taskId}/stop`),
+    mutationFn: () => api.put('/timelogs/stop'),
     onSuccess: () => {
       toast.success('Timer stopped!');
       queryClient.invalidateQueries(['activeTimer', 'myTimeLogs']);
@@ -279,7 +279,7 @@ const Timesheet = () => {
         {activeTimer && (
           <ActiveTimerBanner
             timer={activeTimer}
-            onStop={() => stopMutation.mutate(activeTimer.taskId)}
+            onStop={() => stopMutation.mutate()}
           />
         )}
 

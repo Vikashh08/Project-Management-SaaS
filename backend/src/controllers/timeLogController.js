@@ -40,27 +40,31 @@ const startTimer = async (req, res, next) => {
 // @access  Private
 const stopTimer = async (req, res, next) => {
   try {
-    const { taskId } = req.params;
+    const taskId = req.params.taskId;
     const userId = req.user.id;
 
+    // Find any running timer for this user (optionally filtered by taskId)
+    const whereClause = { userId, endTime: null };
+    if (taskId) whereClause.taskId = taskId;
+
     const running = await prisma.timeLog.findFirst({
-      where: { userId, taskId, endTime: null }
+      where: whereClause
     });
 
     if (!running) {
       res.status(404);
-      throw new Error('No running timer found for this task.');
+      throw new Error('No running timer found.');
     }
 
     const endTime = new Date();
-    const durationMinutes = Math.round((endTime - new Date(running.startTime)) / 60000);
+    const durationMinutes = Math.max(1, Math.round((endTime - new Date(running.startTime)) / 60000));
 
     const timeLog = await prisma.timeLog.update({
       where: { id: running.id },
       data: {
         endTime,
         durationMinutes,
-        description: req.body.description || null,
+        description: req.body?.description || null,
       },
       include: {
         task: { select: { id: true, title: true } }

@@ -15,6 +15,7 @@ const router = express.Router();
 // Global routes (not scoped to a task)
 router.get('/active', protect, getActiveTimer);
 router.get('/my', protect, getMyTimeLogs);
+router.put('/stop', protect, stopTimer);
 router.delete('/:id', protect, deleteTimeLog);
 
 // Task-scoped routes
