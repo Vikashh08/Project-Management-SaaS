@@ -29,6 +29,8 @@ const TeamChat = ({ teamId }) => {
     },
     onSuccess: () => {
       setNewMessage('');
+      // Invalidate queries as a fallback in case socket is delayed or misses
+      queryClient.invalidateQueries(['teamMessages', teamId]);
     }
   });
 

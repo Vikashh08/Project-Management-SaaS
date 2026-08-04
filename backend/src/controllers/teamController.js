@@ -1,5 +1,5 @@
 const prisma = require('../utils/db');
-const { getIo } = require('../../server');
+const { getIo } = require('../utils/socket');
 
 // ─── Get all teams in the org ─────────────────────────────────────────────────
 const getTeams = async (req, res, next) => {
@@ -151,6 +151,31 @@ const addTeamMember = async (req, res, next) => {
   try {
     const { userId, role, designation } = req.body;
     const { id: teamId } = req.params;
+
+    // Get the team to find its organizationId
+    const team = await prisma.team.findUnique({
+      where: { id: teamId }
+    });
+
+    if (!team) {
+      res.status(404);
+      throw new Error('Team not found');
+    }
+
+    // Ensure the user is part of the organization
+    const orgMember = await prisma.organizationMember.findFirst({
+      where: { userId, organizationId: team.organizationId }
+    });
+
+    if (!orgMember) {
+      await prisma.organizationMember.create({
+        data: {
+          userId,
+          organizationId: team.organizationId,
+          role: 'DEVELOPER' // Default org role
+        }
+      });
+    }
 
     const member = await prisma.teamMember.upsert({
       where: { userId_teamId: { userId, teamId } },
