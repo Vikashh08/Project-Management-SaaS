@@ -265,91 +265,271 @@ const Landing = () => {
       {/* Benefits Section */}
       <section id="benefits" className="py-24 px-6 bg-[#fafafc]">
         <div className="max-w-7xl mx-auto text-center mb-16">
-          <span className="text-xs font-bold text-primary uppercase tracking-wider mb-2 block font-semibold">Benefits</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">The smart choice for your team</h2>
-          <p className="text-gray-400 mt-3 max-w-xl mx-auto">Everything you need to simplify your projects, boost productivity, and keep your team aligned.</p>
+          <span className="text-xs font-bold text-primary uppercase tracking-wider mb-2 block font-semibold">Advantages</span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-sans">Key features to boost your productivity</h2>
+          <p className="text-gray-400 mt-3 max-w-xl mx-auto text-sm">Explore the essential tools designed to streamline your workflow, enhance team collaboration, and ensure your projects run smoothly from start to finish.</p>
         </div>
 
         {/* Features / Benefits Grid */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              num: '01',
-              title: 'To-do List',
-              desc: 'Organize your daily tasks effortlessly with our intuitive to-do list. Stay focused and prioritize what matters most.',
-              icon: CheckSquare,
-              color: 'bg-amber-500'
-            },
-            {
-              num: '02',
-              title: 'Team Member Tracking',
-              desc: 'Easily track your team members\' progress and stay connected. Ensure everyone is aligned and working towards shared goals.',
-              icon: Users,
-              color: 'bg-primary'
-            },
-            {
-              num: '03',
-              title: 'Project Tracking',
-              desc: 'Monitor project timelines and milestones in real-time. Keep projects on track and meet your deadlines with confidence.',
-              icon: BarChart3,
-              color: 'bg-emerald-500'
-            }
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
-              <span className="text-4xl font-extrabold text-gray-100 group-hover:text-primary/10 transition-colors absolute right-6 top-6">{item.num}</span>
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white mb-6 ${item.color}`}>
-                <item.icon className="w-6 h-6" />
+          {/* Card 1: To-do List */}
+          <div className="bg-[#fffdf9] rounded-3xl p-8 border border-amber-100/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[460px] relative overflow-hidden group">
+            <div>
+              <div className="flex justify-between items-start mb-6">
+                <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">01</span>
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                  <CheckSquare className="w-5 h-5" />
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">{item.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-3 font-sans">To-do List</h3>
+              <p className="text-xs text-gray-500 leading-relaxed mb-8">Organize your daily tasks effortlessly with our intuitive to-do list. Stay focused and prioritize what matters most.</p>
             </div>
-          ))}
+
+            {/* Illustration Mockup for Card 1 */}
+            <div className="bg-amber-50/40 rounded-2xl p-4 border border-amber-100/20 relative min-h-[160px] flex flex-col gap-2.5 justify-end">
+              <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
+                <span className="flex items-center gap-1 px-2.5 py-1 bg-amber-500 text-white rounded-lg text-[9px] font-bold shadow-sm shadow-amber-500/25">
+                  <CheckSquare className="w-3 h-3" /> Mascot Illustration
+                </span>
+                <span className="px-2.5 py-1 bg-white text-gray-700 border border-gray-100 rounded-lg text-[9px] font-semibold">
+                  Mobile Prototype
+                </span>
+              </div>
+              
+              <div className="bg-white p-3 rounded-xl border border-amber-100/40 shadow-sm">
+                <span className="text-[10px] font-bold text-gray-900 block mb-1">UI Design Kits</span>
+                <p className="text-[8px] text-gray-400 leading-normal">Develop and assemble a comprehensive UI design kit, including components, templates...</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Team Member Tracking */}
+          <div className="bg-[#fbfcff] rounded-3xl p-8 border border-blue-100/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[460px] relative overflow-hidden group">
+            <div>
+              <div className="flex justify-between items-start mb-6">
+                <span className="text-xs font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-lg">02</span>
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Users className="w-5 h-5" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3 font-sans">Team Member Tracking</h3>
+              <p className="text-xs text-gray-500 leading-relaxed mb-8">Easily track your team members' progress and stay connected. Ensure everyone is aligned and working towards shared goals.</p>
+            </div>
+
+            {/* Illustration Mockup for Card 2 */}
+            <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 relative min-h-[160px] flex flex-col gap-2.5 justify-end">
+              <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-bold text-gray-900">Team Members</span>
+                  <span className="text-[8px] text-gray-400">Collaborative Space</span>
+                </div>
+                <div className="flex items-center gap-2 p-1.5 bg-gray-50/50 rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-primary/15 text-primary text-[9px] font-bold flex items-center justify-center">EP</div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[9px] font-semibold text-gray-800 block truncate">Eleanor Pena</span>
+                    <span className="text-[8px] text-gray-400 block truncate">pena@icloud.com</span>
+                  </div>
+                  <MessageSquare className="w-3.5 h-3.5 text-primary" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Project Tracking */}
+          <div className="bg-[#f9fffb] rounded-3xl p-8 border border-emerald-100/50 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between min-h-[460px] relative overflow-hidden group">
+            <div>
+              <div className="flex justify-between items-start mb-6">
+                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">03</span>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-3 font-sans">Project Tracking</h3>
+              <p className="text-xs text-gray-500 leading-relaxed mb-8">Monitor project timelines and milestones in real-time. Keep projects on track and meet your deadlines with confidence.</p>
+            </div>
+
+            {/* Illustration Mockup for Card 3 */}
+            <div className="bg-emerald-50/40 rounded-2xl p-4 border border-emerald-100/20 relative min-h-[160px] flex flex-col gap-2.5 justify-end">
+              <div className="bg-white p-3 rounded-xl border border-emerald-100/40 shadow-sm flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-bold text-gray-900">SprintWave Dashboard</span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[8px] font-bold">In Progress</span>
+                </div>
+                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="bg-emerald-500 h-full w-[65%] rounded-full"></div>
+                </div>
+                <div className="flex justify-between items-center text-[8px] text-gray-400">
+                  <span>UI Design Kit</span>
+                  <span className="font-bold text-gray-900">$120,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Powerful Features Detail */}
-      <section id="features" className="py-24 px-6 bg-white">
+      <section id="features" className="py-24 px-6 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-xs font-bold text-primary uppercase tracking-wider mb-2 block font-semibold">Features</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Powerful Features to Elevate Your Workflow</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-sans">Powerful Features to Elevate Your Workflow</h2>
+            <p className="text-gray-400 mt-3 max-w-xl mx-auto text-sm">Explore advanced tools that help you make smarter decisions, track progress, and manage your tasks with ease. Stay organized and in control with features designed to enhance your productivity.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[
-                { title: 'Make Smart Decisions', desc: 'Get real-time insights, reports, and alerts to help you make more informed decisions.', icon: Shield },
-                { title: 'Optimize Your Goals', desc: 'Track your progress and stay aligned with personal or project goals using smart tracking tools.', icon: Zap },
-                { title: 'Task management', desc: 'Easily manage tasks, deadlines, and priorities to keep projects running smoothly.', icon: CheckSquare },
-                { title: 'Team chat', desc: 'Stay connected with real-time messaging, making team collaboration easier.', icon: MessageSquare }
-              ].map((f, i) => (
-                <div key={i} className="p-6 border border-gray-100 rounded-2xl hover:shadow-md transition-shadow">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
-                    <f.icon className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-bold text-gray-900 mb-2">{f.title}</h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+          {/* 4 Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[
+              { title: 'Make Smart Decisions', desc: 'Get real-time insights, reports, and alerts to help you make more informed decisions.', icon: Shield, active: false },
+              { title: 'Optimize Your Goals', desc: 'Track your progress and stay aligned with personal or project goals using smart tracking tools.', icon: Zap, active: true },
+              { title: 'Task management', desc: 'Easily manage tasks, deadlines, and priorities to keep projects running smoothly.', icon: CheckSquare, active: false },
+              { title: 'Team chat', desc: 'Stay connected with real-time messaging, making team collaboration easier.', icon: MessageSquare, active: false }
+            ].map((f, i) => (
+              <div 
+                key={i} 
+                className={`p-6 rounded-2xl border transition-all duration-300 ${
+                  f.active 
+                    ? 'bg-rose-50/40 border-rose-200/50 shadow-sm' 
+                    : 'border-gray-100 hover:shadow-md'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
+                  f.active ? 'bg-rose-500/10 text-rose-500' : 'bg-primary/10 text-primary'
+                }`}>
+                  <f.icon className="w-5 h-5" />
                 </div>
-              ))}
-            </div>
-
-            {/* Visual demo representation */}
-            <div className="bg-gradient-to-br from-primary to-primary-dark text-white p-8 rounded-3xl relative overflow-hidden shadow-2xl min-h-[350px] flex flex-col justify-between">
-              <div className="absolute right-[-20%] top-[-20%] w-72 h-72 rounded-full bg-white/5 pointer-events-none"></div>
-              <div>
-                <span className="text-xs font-bold text-indigo-200 uppercase tracking-widest mb-2 block font-semibold">Live Preview</span>
-                <h3 className="text-2xl font-bold mb-4 font-sans">See how TaskFlowAI works in 2 minutes</h3>
-                <p className="text-sm text-indigo-100 leading-relaxed max-w-sm">Learn how to streamline tasks, manage your teammates, and track organization health easily.</p>
+                <h4 className="font-bold text-gray-900 mb-2 font-sans text-sm">{f.title}</h4>
+                <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
               </div>
-              <div>
-                <button 
-                  onClick={() => navigate('/login')}
-                  className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg flex items-center gap-2 hover:bg-indigo-50 transition-colors"
-                >
-                  <Play className="w-4 h-4 fill-primary" />
-                  Play Demo Video
-                </button>
+            ))}
+          </div>
+
+          {/* Interactive Play Button Row */}
+          <div className="flex justify-center mb-12">
+            <button 
+              onClick={() => navigate('/login')}
+              className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all"
+            >
+              <Play className="w-4 h-4 fill-white" />
+              Play now
+            </button>
+          </div>
+
+          {/* Giant Browser Mockup representing actual App */}
+          <div className="max-w-5xl mx-auto bg-gray-900 p-2 lg:p-3 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-gray-800">
+            <div className="bg-[#f8f7fa] rounded-xl overflow-hidden aspect-[16/10] w-full text-left flex flex-col">
+              {/* Window Bar */}
+              <div className="bg-white px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                </div>
+                <div className="bg-gray-100 rounded-lg text-[9px] text-gray-400 px-3 py-1 w-64 text-center truncate font-medium">
+                  app.taskflowai.com/dashboard
+                </div>
+                <div className="w-10"></div>
+              </div>
+
+              {/* Layout Content */}
+              <div className="flex-1 flex overflow-hidden text-[10px] text-gray-800">
+                {/* Sidebar Mock */}
+                <div className="w-1/5 bg-white border-r border-gray-100 p-3 hidden sm:flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="font-bold text-gray-900 flex items-center gap-1.5 text-xs">
+                      <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center text-white text-[10px] font-bold">T</div>
+                      TaskFlowAI
+                    </div>
+                    <div className="space-y-1">
+                      <div className="p-1.5 bg-primary/10 text-primary rounded-lg font-semibold flex items-center gap-2">
+                        <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                      </div>
+                      <div className="p-1.5 text-gray-500 flex items-center gap-2">
+                        <CheckSquare className="w-3.5 h-3.5" /> My Tasks
+                      </div>
+                      <div className="p-1.5 text-gray-500 flex items-center gap-2">
+                        <Users className="w-3.5 h-3.5" /> Projects
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2 bg-gray-50 rounded-xl">
+                    <span className="font-bold text-[9px] block text-gray-900 mb-0.5">Upgrade Workspace</span>
+                    <span className="text-[8px] text-gray-400 block mb-2">Get premium tools</span>
+                    <button className="w-full bg-primary text-white text-[8px] font-bold py-1.5 rounded-lg">Go Pro</button>
+                  </div>
+                </div>
+
+                {/* Dashboard Main Grid */}
+                <div className="flex-1 p-4 bg-[#f8f7fa] overflow-y-auto flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-base font-bold text-gray-900 font-sans">Hello, Cecilia</h4>
+                      <p className="text-gray-400 text-[8px]">Let's get things done!</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-white border border-gray-100 rounded-lg flex items-center justify-center"><Search className="w-3 h-3 text-gray-400" /></div>
+                      <div className="w-5 h-5 bg-white border border-gray-100 rounded-lg flex items-center justify-center text-xs font-bold text-primary">C</div>
+                    </div>
+                  </div>
+
+                  {/* Top Stats */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { label: 'Project Finished', val: '12' },
+                      { label: 'Time Tracked (week)', val: '20h 30m' },
+                      { label: 'Total Revenue', val: '$2190' },
+                      { label: 'Total Members', val: '21' }
+                    ].map((st, i) => (
+                      <div key={i} className="p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
+                        <span className="font-bold text-gray-900 text-xs block">{st.val}</span>
+                        <span className="text-gray-400 text-[8px] mt-0.5 block">{st.label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Lists Section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Ongoing tasks */}
+                    <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-gray-900">Ongoing Tasks</span>
+                        <span className="text-[8px] text-primary font-semibold">View All</span>
+                      </div>
+                      {[
+                        { title: 'UI Kit Development', label: 'Important', bg: 'bg-[#fff7ed] text-orange-700' },
+                        { title: 'Client Feedback Review', label: 'OK', bg: 'bg-[#f0fdf4] text-green-700' },
+                        { title: 'Sprint Planning', label: 'Meh', bg: 'bg-[#fefce8] text-yellow-700' }
+                      ].map((t, idx) => (
+                        <div key={idx} className="p-2 border border-gray-50 rounded-lg flex items-center justify-between text-[9px]">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${t.bg}`}>{t.label}</span>
+                            <span className="font-semibold text-gray-800">{t.title}</span>
+                          </div>
+                          <div className="flex -space-x-1">
+                            <div className="w-4 h-4 rounded-full bg-blue-200 border border-white"></div>
+                            <div className="w-4 h-4 rounded-full bg-purple-200 border border-white"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Right Panel: Team Standup */}
+                    <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-gray-900">Internal Teams</span>
+                        <span className="text-[8px] text-gray-400">August, 2026</span>
+                      </div>
+                      <div className="p-2 bg-rose-50/40 rounded-lg border border-rose-100/50 relative">
+                        <span className="text-[9px] font-bold text-gray-900 block mb-1">Mobile Prototype</span>
+                        <p className="text-[8px] text-gray-400 leading-normal">Develop mockups and wireframes for mobile redesign...</p>
+                        {/* Elle Cohan avatar float */}
+                        <div className="absolute right-2 bottom-2 flex items-center gap-1.5 bg-emerald-500 text-white rounded px-1.5 py-0.5 text-[8px] font-bold shadow">
+                          <span>Elle Cohan</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
