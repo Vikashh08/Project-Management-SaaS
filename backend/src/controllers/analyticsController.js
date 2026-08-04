@@ -7,52 +7,42 @@ const getDashboardAnalytics = async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    // Fetch projects where user is owner or member
-    const projectsCount = await prisma.project.count({
-      where: {
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } }
-        ]
-      }
-    });
-
-    const activeProjects = await prisma.project.count({
-      where: {
-        status: 'ACTIVE',
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } }
-        ]
-      }
-    });
-
-    // Task counts for user
-    const tasksCount = await prisma.task.count({
-      where: { assignees: { some: { userId } } }
-    });
-
-    const completedTasks = await prisma.task.count({
-      where: { status: 'DONE', assignees: { some: { userId } } }
-    });
-
-    const pendingTasks = await prisma.task.count({
-      where: { status: { not: 'DONE' }, assignees: { some: { userId } } }
-    });
-
-    // --- NEW: Task Status Distribution ---
-    // Count all tasks in all accessible projects
-    const allTasks = await prisma.task.findMany({
-      where: {
-        project: {
-          OR: [
-            { ownerId: userId },
-            { members: { some: { userId } } }
-          ]
+    // Fetch all analytics data in parallel for maximum performance
+    const [
+      projectsCount,
+      activeProjects,
+      tasksCount,
+      completedTasks,
+      pendingTasks,
+      allTasks
+    ] = await Promise.all([
+      prisma.project.count({
+        where: { OR: [{ ownerId: userId }, { members: { some: { userId } } }] }
+      }),
+      prisma.project.count({
+        where: {
+          status: 'ACTIVE',
+          OR: [{ ownerId: userId }, { members: { some: { userId } } }]
         }
-      },
-      select: { status: true }
-    });
+      }),
+      prisma.task.count({
+        where: { assignees: { some: { userId } } }
+      }),
+      prisma.task.count({
+        where: { status: 'DONE', assignees: { some: { userId } } }
+      }),
+      prisma.task.count({
+        where: { status: { not: 'DONE' }, assignees: { some: { userId } } }
+      }),
+      prisma.task.findMany({
+        where: {
+          project: {
+            OR: [{ ownerId: userId }, { members: { some: { userId } } }]
+          }
+        },
+        select: { status: true }
+      })
+    ]);
 
     const statusDistribution = {
       TODO: 0,
