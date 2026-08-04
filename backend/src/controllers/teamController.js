@@ -12,25 +12,16 @@ const getOrganizationMembers = async (req, res) => {
         where: { userId: req.user.id }
       });
       if (!userMember) {
-        return res.json([]); // User has no organization yet
+        return res.json([]);
       }
       orgId = userMember.organizationId;
     }
 
     const members = await prisma.organizationMember.findMany({
-      where: {
-        organizationId: orgId
-      },
+      where: { organizationId: orgId },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatarUrl: true,
-            role: true,
-            status: true,
-          }
+          select: { id: true, name: true, email: true, avatarUrl: true, role: true, status: true }
         }
       }
     });
@@ -42,6 +33,44 @@ const getOrganizationMembers = async (req, res) => {
   }
 };
 
+// @desc    Update a member's role
+// @route   PUT /api/teams/members/:memberId/role
+// @access  Private (Admin)
+const updateMemberRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    const { memberId } = req.params;
+
+    const updated = await prisma.organizationMember.update({
+      where: { id: memberId },
+      data: { role },
+    });
+
+    res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Remove a member from the organization
+// @route   DELETE /api/teams/members/:memberId
+// @access  Private (Admin)
+const removeMember = async (req, res, next) => {
+  try {
+    const { memberId } = req.params;
+
+    await prisma.organizationMember.delete({
+      where: { id: memberId },
+    });
+
+    res.json({ message: 'Member removed' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
-  getOrganizationMembers
+  getOrganizationMembers,
+  updateMemberRole,
+  removeMember,
 };
