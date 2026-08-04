@@ -62,6 +62,11 @@ enum BookmarkType {
   TASK
 }
 
+enum TeamStatus {
+  ACTIVE
+  ARCHIVED
+}
+
 // -----------------------------------------------------------------------------
 // MODELS
 // -----------------------------------------------------------------------------
@@ -87,6 +92,7 @@ model User {
   ownedOrgs       Organization[]       @relation("OrgOwner")
   orgMemberships  OrganizationMember[]
   teamMemberships TeamMember[]
+  ledTeams        Team[]               @relation("TeamLead")
   projectMemberships ProjectMember[]
   ownedProjects   Project[]            @relation("ProjectOwner")
   reportedTasks   Task[]               @relation("TaskReporter")
@@ -137,12 +143,18 @@ model OrganizationMember {
 }
 
 model Team {
-  id              String   @id @default(uuid())
+  id              String      @id @default(uuid())
   name            String
+  description     String?
   avatarUrl       String?
+  color           String      @default("#6366f1")
+  email           String?
+  status          TeamStatus  @default(ACTIVE)
   organizationId  String
+  leadId          String?
   
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lead            User?        @relation("TeamLead", fields: [leadId], references: [id])
   members         TeamMember[]
   invitations     Invitation[]
 
@@ -154,6 +166,9 @@ model TeamMember {
   id              String   @id @default(uuid())
   userId          String
   teamId          String
+  role            Role     @default(DEVELOPER)
+  designation     String?
+  skills          String[]
   
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)

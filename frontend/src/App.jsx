@@ -6,7 +6,8 @@ import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
-import Teams from './pages/Teams';
+import TeamsPage from './pages/TeamsPage';
+import TeamDetails from './pages/TeamDetails';
 import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
@@ -45,7 +46,8 @@ function App() {
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<ProjectDetails />} />
               <Route path="tasks" element={<Tasks />} />
-              <Route path="teams" element={<Teams />} />
+              <Route path="teams" element={<TeamsPage />} />
+              <Route path="teams/:id" element={<TeamDetails />} />
               <Route path="calendar" element={<Calendar />} />
               <Route path="settings" element={<Settings />} />
             </Route>
