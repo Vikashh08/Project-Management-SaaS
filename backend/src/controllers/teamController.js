@@ -1,4 +1,5 @@
 const prisma = require('../utils/db');
+const { getIo } = require('../../server');
 
 // ─── Get all teams in the org ─────────────────────────────────────────────────
 const getTeams = async (req, res, next) => {
@@ -222,6 +223,77 @@ const removeMember = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+// ─── Get Team Messages ────────────────────────────────────────────────────────
+const getTeamMessages = async (req, res, next) => {
+  try {
+    const { id: teamId } = req.params;
+    const messages = await prisma.teamMessage.findMany({
+      where: { teamId },
+      include: {
+        sender: { select: { id: true, name: true, avatarUrl: true } }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+    res.json(messages);
+  } catch (error) { next(error); }
+};
+
+// ─── Post Team Message ────────────────────────────────────────────────────────
+const postTeamMessage = async (req, res, next) => {
+  try {
+    const { id: teamId } = req.params;
+    const { content } = req.body;
+
+    if (!content) {
+      res.status(400);
+      throw new Error('Message content is required');
+    }
+
+    const message = await prisma.teamMessage.create({
+      data: {
+        content,
+        teamId,
+        senderId: req.user.id
+      },
+      include: {
+        sender: { select: { id: true, name: true, avatarUrl: true } }
+      }
+    });
+
+    try {
+      getIo().to(`team_${teamId}`).emit('NEW_TEAM_MESSAGE', message);
+    } catch (e) {
+      console.error('Socket error in postTeamMessage:', e);
+    }
+
+    res.status(201).json(message);
+  } catch (error) { next(error); }
+};
+
+// ─── Get Team Files ───────────────────────────────────────────────────────────
+const getTeamFiles = async (req, res, next) => {
+  try {
+    const { id: teamId } = req.params;
+    const files = await prisma.attachment.findMany({
+      where: { teamId },
+      include: {
+        uploader: { select: { id: true, name: true, avatarUrl: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(files);
+  } catch (error) { next(error); }
+};
+
+// ─── Delete Team File ─────────────────────────────────────────────────────────
+const deleteTeamFile = async (req, res, next) => {
+  try {
+    const { fileId } = req.params;
+    await prisma.attachment.delete({ where: { id: fileId } });
+    res.json({ message: 'File deleted' });
+  } catch (error) { next(error); }
+};
+
 module.exports = {
   getTeams,
   getTeamById,
@@ -233,4 +305,8 @@ module.exports = {
   getOrganizationMembers,
   updateMemberRole,
   removeMember,
+  getTeamMessages,
+  postTeamMessage,
+  getTeamFiles,
+  deleteTeamFile,
 };

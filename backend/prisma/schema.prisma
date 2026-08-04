@@ -104,6 +104,7 @@ model User {
   timeLogs        TimeLog[]
   bookmarks       Bookmark[]
   sentInvitations Invitation[]
+  teamMessages    TeamMessage[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -162,6 +163,9 @@ model Team {
   updatedAt       DateTime @updatedAt
   
   projects        Project[]
+  messages        TeamMessage[]
+  sprints         Sprint[]
+  attachments     Attachment[]
 }
 
 model TeamMember {
@@ -241,9 +245,11 @@ model Task {
   
   projectId       String
   reporterId      String
+  sprintId        String?
   
   project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   reporter        User     @relation("TaskReporter", fields: [reporterId], references: [id])
+  sprint          Sprint?  @relation(fields: [sprintId], references: [id], onDelete: SetNull)
   
   assignees       TaskAssignee[]
   subtasks        Subtask[]
@@ -261,6 +267,7 @@ model Task {
 
   @@index([projectId])
   @@index([reporterId])
+  @@index([sprintId])
 }
 
 model TaskAssignee {
@@ -347,10 +354,12 @@ model Attachment {
   uploaderId      String
   taskId          String?
   projectId       String?
+  teamId          String?
   
   uploader        User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
   task            Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
   project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  team            Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
 }
@@ -459,4 +468,37 @@ model Invitation {
 
   createdAt       DateTime @default(now())
   expiresAt       DateTime
+}
+
+model TeamMessage {
+  id              String   @id @default(uuid())
+  content         String
+  teamId          String
+  senderId        String
+  
+  team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  sender          User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([senderId])
+}
+
+model Sprint {
+  id              String   @id @default(uuid())
+  name            String
+  startDate       DateTime
+  endDate         DateTime
+  status          String   @default("PLANNED") // PLANNED, ACTIVE, COMPLETED
+  teamId          String
+  
+  team            Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  tasks           Task[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([teamId])
 }

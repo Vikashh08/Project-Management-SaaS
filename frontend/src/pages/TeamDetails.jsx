@@ -11,6 +11,9 @@ import toast from 'react-hot-toast';
 import Loader from '../components/Loader';
 import PermissionGate from '../components/PermissionGate';
 import { ProjectCard, ProjectModal } from '../components/ProjectComponents';
+import TeamChat from '../components/team/TeamChat';
+import TeamFiles from '../components/team/TeamFiles';
+import TeamSprints from '../components/team/TeamSprints';
 
 // ── Stat Card ──────────────────────────────────────────────────────────────
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -250,6 +253,9 @@ const TeamDetails = () => {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'projects', label: `Projects` },
+    { id: 'sprints', label: 'Sprints' },
+    { id: 'chat', label: 'Chat' },
+    { id: 'files', label: 'Files' },
     { id: 'members', label: `Members (${team.members?.length || 0})` },
     { id: 'activity', label: 'Activity' },
   ];
@@ -462,6 +468,18 @@ const TeamDetails = () => {
               </motion.div>
             )}
           </div>
+        )}
+
+        {activeTab === 'chat' && (
+          <TeamChat teamId={id} />
+        )}
+
+        {activeTab === 'files' && (
+          <TeamFiles teamId={id} />
+        )}
+
+        {activeTab === 'sprints' && (
+          <TeamSprints teamId={id} />
         )}
 
         {activeTab === 'activity' && (

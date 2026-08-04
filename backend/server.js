@@ -38,6 +38,7 @@ app.use('/api/notifications', require('./src/routes/notificationRoutes'));
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 app.use('/api/analytics', require('./src/routes/analyticsRoutes'));
 app.use('/api/teams', require('./src/routes/teamRoutes'));
+app.use('/api/teams/:teamId/sprints', require('./src/routes/sprintRoutes'));
 app.use('/api/search', require('./src/routes/searchRoutes'));
 app.use('/api/invites', require('./src/routes/inviteRoutes'));
 

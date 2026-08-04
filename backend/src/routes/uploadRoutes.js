@@ -16,7 +16,7 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
       throw new Error('Please upload a file');
     }
 
-    const { taskId, projectId } = req.body;
+    const { taskId, projectId, teamId } = req.body;
 
     // Format URL for local storage if Cloudinary is not used
     let fileUrl = req.file.path;
@@ -34,6 +34,7 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
         uploaderId: req.user.id,
         taskId: taskId || null,
         projectId: projectId || null,
+        teamId: teamId || null,
       },
       include: {
         task: { select: { projectId: true } }

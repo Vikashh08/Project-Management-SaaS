@@ -28,6 +28,12 @@ const initializeSocket = (server) => {
       console.log(`User joined project room: project_${projectId}`);
     });
 
+    // Join a team room
+    socket.on('join_team', (teamId) => {
+      socket.join(`team_${teamId}`);
+      console.log(`User joined team room: team_${teamId}`);
+    });
+
     // Join a task room
     socket.on('join_task', (taskId) => {
       socket.join(`task_${taskId}`);

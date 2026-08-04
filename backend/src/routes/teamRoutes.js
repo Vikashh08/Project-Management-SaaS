@@ -2,7 +2,9 @@ const express = require('express');
 const {
   getTeams, getTeamById, createTeam, updateTeam, deleteTeam,
   addTeamMember, removeTeamMember,
-  getOrganizationMembers, updateMemberRole, removeMember
+  getOrganizationMembers, updateMemberRole, removeMember,
+  getTeamMessages, postTeamMessage,
+  getTeamFiles, deleteTeamFile
 } = require('../controllers/teamController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -20,5 +22,12 @@ router.route('/:id').get(protect, getTeamById).put(protect, updateTeam).delete(p
 // Team member management
 router.route('/:id/members').post(protect, addTeamMember);
 router.route('/:id/members/:userId').delete(protect, removeTeamMember);
+
+// Team messaging
+router.route('/:id/messages').get(protect, getTeamMessages).post(protect, postTeamMessage);
+
+// Team files
+router.route('/:id/files').get(protect, getTeamFiles);
+router.route('/:id/files/:fileId').delete(protect, deleteTeamFile);
 
 module.exports = router;
