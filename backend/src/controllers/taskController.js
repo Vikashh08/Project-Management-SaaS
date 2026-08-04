@@ -1,5 +1,5 @@
 const prisma = require('../utils/db');
-const { getIo } = require('../../server');
+const { getIo } = require('../utils/socket');
 const { logActivity } = require('../utils/activityLogger');
 const { createNotification } = require('./notificationController');
 

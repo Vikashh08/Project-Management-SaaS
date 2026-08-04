@@ -1,5 +1,6 @@
 const prisma = require('../utils/db');
 const { getIo } = require('../utils/socket');
+const { createNotification } = require('./notificationController');
 
 // ─── Get all teams in the org ─────────────────────────────────────────────────
 const getTeams = async (req, res, next) => {
@@ -185,6 +186,16 @@ const addTeamMember = async (req, res, next) => {
       update: { role, designation },
       include: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
     });
+
+    // Notify the added user
+    if (userId !== req.user.id) {
+      await createNotification(
+        userId,
+        'TEAM_ADDED',
+        `${req.user.name} added you to team "${team.name}"`,
+        `/teams/${teamId}`
+      );
+    }
 
     res.status(201).json(member);
   } catch (error) { next(error); }

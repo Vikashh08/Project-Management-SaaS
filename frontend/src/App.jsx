@@ -10,6 +10,7 @@ import TeamsPage from './pages/TeamsPage';
 import TeamDetails from './pages/TeamDetails';
 import Calendar from './pages/Calendar';
 import Analytics from './pages/Analytics';
+import Activity from './pages/Activity';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -51,6 +52,7 @@ function App() {
               <Route path="teams/:id" element={<TeamDetails />} />
               <Route path="calendar" element={<Calendar />} />
               <Route path="analytics" element={<Analytics />} />
+              <Route path="activity" element={<Activity />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Route>

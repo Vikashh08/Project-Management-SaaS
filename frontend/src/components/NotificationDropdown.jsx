@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Check, Clock } from 'lucide-react';
+import { Bell, Check, Clock, CheckCheck } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSocket } from '../context/SocketContext';
+import { Link } from 'react-router';
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const queryClient = useQueryClient();
+  const { socket } = useSocket();
 
   // Fetch notifications
   const { data: notifications = [] } = useQuery({
@@ -16,7 +19,6 @@ const NotificationDropdown = () => {
       const { data } = await api.get('/notifications');
       return data;
     },
-    // Polling every 60s as a fallback to sockets
     refetchInterval: 60000 
   });
 
@@ -30,6 +32,17 @@ const NotificationDropdown = () => {
     refetchInterval: 60000 
   });
 
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (socket) {
+      const handleNewNotification = () => {
+        queryClient.invalidateQueries(['notifications']);
+      };
+      socket.on('new_notification', handleNewNotification);
+      return () => socket.off('new_notification', handleNewNotification);
+    }
+  }, [socket, queryClient]);
+
   // Mark as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (id) => {
@@ -40,11 +53,20 @@ const NotificationDropdown = () => {
     }
   });
 
+  // Mark all as read
+  const markAllMutation = useMutation({
+    mutationFn: async () => {
+      await api.put('/notifications/read-all');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['notifications']);
+    }
+  });
+
   const acceptInviteMutation = useMutation({
     mutationFn: async (token) => api.post(`/invites/accept/${token}`),
     onSuccess: () => {
       queryClient.invalidateQueries(['pendingInvites']);
-      // Optional: invalidate teams/organizations if needed, or simply reload
       window.location.reload(); 
     }
   });
@@ -82,7 +104,9 @@ const NotificationDropdown = () => {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-surface-color"></span>
+          <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1 border-2 border-surface-color">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
         )}
       </button>
 
@@ -93,22 +117,34 @@ const NotificationDropdown = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-80 bg-surface-color border border-border-color rounded-xl shadow-xl z-50 overflow-hidden"
+            className="absolute right-0 mt-2 w-96 bg-surface-color border border-border-color rounded-xl shadow-xl z-50 overflow-hidden"
           >
             <div className="p-4 border-b border-border-color flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
-              <h3 className="font-bold text-text-color">Notifications</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-text-color">Notifications</h3>
+                {unreadCount > 0 && (
+                  <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded-full font-medium">
+                    {unreadCount} new
+                  </span>
+                )}
+              </div>
               {unreadCount > 0 && (
-                <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded-full font-medium">
-                  {unreadCount} new
-                </span>
+                <button
+                  onClick={() => markAllMutation.mutate()}
+                  disabled={markAllMutation.isPending}
+                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" /> Mark all read
+                </button>
               )}
             </div>
 
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 && pendingInvites.length === 0 ? (
-                <div className="p-6 text-center text-text-muted">
-                  <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                  <p className="text-sm">No notifications yet.</p>
+                <div className="p-8 text-center text-text-muted">
+                  <Bell className="w-10 h-10 mx-auto mb-3 opacity-15" />
+                  <p className="text-sm font-medium">You're all caught up!</p>
+                  <p className="text-xs mt-1 text-gray-400">No new notifications.</p>
                 </div>
               ) : (
                 <>
@@ -188,7 +224,13 @@ const NotificationDropdown = () => {
             </div>
             
             <div className="p-3 border-t border-border-color text-center bg-gray-50 dark:bg-gray-900/50">
-              <a href="/settings" className="text-xs text-text-muted hover:text-text-color font-medium">View all activity</a>
+              <Link 
+                to="/activity" 
+                onClick={() => setIsOpen(false)}
+                className="text-xs text-primary hover:text-primary-hover font-medium"
+              >
+                View all activity →
+              </Link>
             </div>
           </motion.div>
         )}

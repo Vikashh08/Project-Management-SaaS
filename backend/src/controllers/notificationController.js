@@ -33,6 +33,35 @@ const markAsRead = async (req, res, next) => {
   }
 };
 
+// @desc    Mark all notifications as read
+// @route   PUT /api/notifications/read-all
+// @access  Private
+const markAllAsRead = async (req, res, next) => {
+  try {
+    await prisma.notification.updateMany({
+      where: { userId: req.user.id, isRead: false },
+      data: { isRead: true },
+    });
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete all read notifications
+// @route   DELETE /api/notifications/clear
+// @access  Private
+const clearNotifications = async (req, res, next) => {
+  try {
+    await prisma.notification.deleteMany({
+      where: { userId: req.user.id, isRead: true },
+    });
+    res.json({ message: 'Cleared read notifications' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Helper: Create and dispatch a notification
 const createNotification = async (userId, type, content, link, shouldEmail = false) => {
   try {
@@ -70,5 +99,7 @@ const createNotification = async (userId, type, content, link, shouldEmail = fal
 module.exports = {
   getNotifications,
   markAsRead,
+  markAllAsRead,
+  clearNotifications,
   createNotification,
 };
