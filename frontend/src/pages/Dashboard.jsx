@@ -31,8 +31,8 @@ ChartJS.register(
   ArcElement
 );
 
-const DashboardCard = ({ title, value, icon: Icon, colorClass }) => (
-  <div className="saas-card p-5 flex items-center justify-between">
+const DashboardCard = ({ title, value, icon: Icon, colorClass, iconBg }) => (
+  <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200">
     <div>
       <h3 className="text-text-muted text-sm font-medium mb-1">{title}</h3>
       <p className="text-3xl font-bold text-text-color">{value}</p>
@@ -79,8 +79,8 @@ const Dashboard = () => {
           stats?.statusDistribution?.DONE || 0
         ],
         backgroundColor: [
-          'rgba(156, 163, 175, 0.8)', // gray-400
-          'rgba(59, 130, 246, 0.8)',  // blue-500
+          'rgba(234, 179, 8, 0.8)',   // yellow-500
+          'rgba(249, 115, 22, 0.8)',  // orange-500
           'rgba(168, 85, 247, 0.8)',  // purple-500
           'rgba(34, 197, 94, 0.8)',   // green-500
         ],
@@ -93,7 +93,7 @@ const Dashboard = () => {
     responsive: true,
     cutout: '75%',
     plugins: {
-      legend: { position: 'bottom', labels: { color: '#9CA3AF' } }
+      legend: { position: 'bottom', labels: { color: '#9CA3AF', usePointStyle: true, padding: 16 } }
     }
   };
 
@@ -107,8 +107,8 @@ const Dashboard = () => {
       {
         label: 'Active Tasks',
         data: workloadData.length > 0 ? workloadData : [0],
-        backgroundColor: 'rgba(59, 130, 246, 0.8)', // blue-500
-        borderRadius: 4,
+        backgroundColor: 'rgba(124, 58, 237, 0.8)', // primary purple
+        borderRadius: 8,
       }
     ]
   };
@@ -121,7 +121,7 @@ const Dashboard = () => {
     scales: {
       y: { 
         beginAtZero: true, 
-        grid: { color: 'rgba(156, 163, 175, 0.1)' },
+        grid: { color: 'rgba(156, 163, 175, 0.08)' },
         ticks: { precision: 0, color: '#9CA3AF' } 
       },
       x: { 
@@ -138,7 +138,7 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold text-text-color">Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
           <p className="text-text-muted text-sm mt-1">Here's what's happening with your projects today.</p>
         </div>
-        <button className="hidden sm:block px-4 py-2 bg-white dark:bg-gray-800 border border-border-color text-text-color rounded-lg text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <button className="hidden sm:block px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-text-color rounded-xl text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           Download Report
         </button>
       </div>
@@ -150,7 +150,7 @@ const Dashboard = () => {
             title="Total Projects" 
             value={stats?.totalProjects || 0} 
             icon={LayoutDashboard}
-            colorClass="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+            colorClass="bg-primary/10 text-primary"
           />
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
@@ -183,7 +183,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         
         {/* Status Distribution */}
-        <div className="saas-card p-6 lg:col-span-1">
+        <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 lg:col-span-1 shadow-sm">
           <h2 className="text-lg font-bold text-text-color mb-6">Task Status</h2>
           <div className="h-64 flex items-center justify-center relative">
              <Doughnut data={donutData} options={donutOptions} />
@@ -195,7 +195,7 @@ const Dashboard = () => {
         </div>
 
         {/* Team Workload */}
-        <div className="saas-card p-6 lg:col-span-2">
+        <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 lg:col-span-2 shadow-sm">
           <h2 className="text-lg font-bold text-text-color mb-6">Team Workload (Active Tasks)</h2>
           <div className="h-64 w-full">
             <Bar data={barChartData} options={barChartOptions} />
@@ -206,10 +206,10 @@ const Dashboard = () => {
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
          {/* Recent Activity */}
-         <div className="saas-card p-0 overflow-hidden">
-          <div className="p-5 border-b border-border-color flex justify-between items-center">
+         <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
             <h2 className="text-lg font-bold text-text-color">Recent Activity</h2>
-            <a href="/settings" className="text-sm text-blue-600 hover:underline">View all</a>
+            <a href="/dashboard/activity" className="text-sm text-primary hover:text-primary-dark font-medium transition-colors">View all</a>
           </div>
           <div className="p-5">
             {activities?.length === 0 ? (
@@ -222,8 +222,8 @@ const Dashboard = () => {
                    
                    return (
                      <div key={activity.id} className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center">
-                           <Clock className="w-4 h-4 text-blue-600" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
+                           <Clock className="w-4 h-4 text-primary" />
                         </div>
                         <div>
                           <p className="text-sm text-text-color font-medium capitalize">
@@ -245,18 +245,18 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions Placeholder */}
-        <div className="saas-card p-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden">
+        {/* Quick Actions / CTA */}
+        <div className="bg-gradient-to-br from-primary to-purple-800 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
           <div className="relative z-10">
             <h2 className="text-xl font-bold mb-2">Need to onboard your team?</h2>
-            <p className="text-blue-100 text-sm mb-6 max-w-sm">
+            <p className="text-purple-200 text-sm mb-6 max-w-sm">
               Invite your teammates to collaborate, assign tasks, and track progress together in real-time.
             </p>
-            <a href="/teams" className="inline-block px-5 py-2.5 bg-white text-blue-600 font-semibold rounded-lg shadow-sm hover:bg-gray-50 transition-colors text-sm">
+            <a href="/dashboard/teams" className="inline-block px-5 py-2.5 bg-white text-primary font-semibold rounded-xl shadow-sm hover:bg-gray-50 transition-colors text-sm">
               Invite Members
             </a>
           </div>
-          <div className="absolute right-0 bottom-0 transform translate-x-1/4 translate-y-1/4 opacity-20 pointer-events-none">
+          <div className="absolute right-0 bottom-0 transform translate-x-1/4 translate-y-1/4 opacity-15 pointer-events-none">
              <LayoutDashboard className="w-48 h-48" />
           </div>
         </div>

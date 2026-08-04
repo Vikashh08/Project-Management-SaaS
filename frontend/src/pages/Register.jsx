@@ -12,7 +12,7 @@ const Register = () => {
   const onSubmit = async (data) => {
     const success = await register(data.name, data.email, data.password);
     if (success) {
-      const returnTo = location.state?.returnTo || '/';
+      const returnTo = location.state?.returnTo || '/dashboard';
       navigate(returnTo);
     }
   };

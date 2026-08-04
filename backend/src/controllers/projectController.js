@@ -50,7 +50,6 @@ const createProject = async (req, res, next) => {
         visibility: visibility || 'PRIVATE',
         ownerId: req.user.id,
         organizationId: finalOrgId,
-        teamId: teamId || null,
       },
     });
 

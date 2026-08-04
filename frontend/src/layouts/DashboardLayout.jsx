@@ -32,11 +32,17 @@ const DashboardLayout = () => {
       )}
       
       <div className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
+        <Sidebar 
+          onClose={() => setSidebarOpen(false)} 
+          onSearchClick={() => setIsCommandPaletteOpen(true)}
+        />
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden relative w-full z-10">
-        <Topbar onMenuClick={() => setSidebarOpen(true)} onSearchClick={() => setIsCommandPaletteOpen(true)} />
+        <Topbar 
+          onMenuClick={() => setSidebarOpen(true)} 
+          onSearchClick={() => setIsCommandPaletteOpen(true)} 
+        />
         <main className="flex-1 overflow-y-auto bg-transparent">
           <Outlet />
         </main>

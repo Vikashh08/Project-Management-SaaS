@@ -77,7 +77,7 @@ const ProfileDropdown = () => {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  navigate('/settings');
+                  navigate('/dashboard/settings');
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
@@ -88,7 +88,7 @@ const ProfileDropdown = () => {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  navigate('/settings');
+                  navigate('/dashboard/settings');
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >

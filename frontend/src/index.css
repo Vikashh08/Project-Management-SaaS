@@ -5,19 +5,20 @@
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Classic SaaS Indigo Primary */
-  --color-primary: #4f46e5;
-  --color-primary-dark: #4338ca;
-  --color-primary-light: #818cf8;
+  /* Vibrant Purple Primary (matching reference design) */
+  --color-primary: #7c3aed;
+  --color-primary-dark: #6d28d9;
+  --color-primary-light: #a78bfa;
+  --color-primary-hover: #6d28d9;
   
   /* Crisp Light Mode */
-  --color-background: #f4f4f5; /* Ultra light gray canvas */
-  --color-surface: #ffffff; /* Pure white cards */
-  --color-text: #09090b; /* High contrast black/gray */
-  --color-text-muted: #52525b; /* Medium gray */
-  --color-border: #e4e4e7; /* Sharp 1px gray border */
+  --color-background: #f8f7fa;
+  --color-surface: #ffffff;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6b7280;
+  --color-border: #e8e8ed;
   
-  /* Sleek Dark Mode (Linear inspired) */
+  /* Sleek Dark Mode */
   --color-dark-background: #09090b;
   --color-dark-surface: #121212;
   --color-dark-text: #fafafa;
@@ -60,9 +61,193 @@
 
 @layer utilities {
   .saas-card {
-    @apply bg-surface-color border border-border-color rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply bg-surface-color border border-border-color rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200;
   }
   .saas-input {
-    @apply px-4 py-2 bg-surface-color border border-border-color rounded-lg text-text-color focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 bg-surface-color border border-border-color rounded-lg text-text-color focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
+  .saas-button {
+    @apply px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.97];
+  }
+}
+
+/* Avatar stack styles */
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-stack .avatar-item {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-left: -8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: white;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.avatar-stack .avatar-item:first-child {
+  margin-left: 0;
+}
+
+.avatar-stack .avatar-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-stack .avatar-overflow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  background: #7c3aed;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Sidebar redesign styles */
+.sidebar-redesign {
+  background: #ffffff;
+  border-radius: 0 24px 24px 0;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06);
+}
+
+.dark .sidebar-redesign {
+  background: #121212;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+/* Kanban column backgrounds */
+.kanban-column-todo {
+  background: linear-gradient(180deg, #fef9c3 0%, #fef9c310 100%);
+}
+.kanban-column-inprogress {
+  background: linear-gradient(180deg, #fed7aa 0%, #fed7aa10 100%);
+}
+.kanban-column-review {
+  background: linear-gradient(180deg, #e9d5ff 0%, #e9d5ff10 100%);
+}
+.kanban-column-done {
+  background: linear-gradient(180deg, #bbf7d0 0%, #bbf7d010 100%);
+}
+
+/* View tab styles */
+.view-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-tab:hover {
+  color: #1a1a2e;
+}
+
+.view-tab.active {
+  color: #1a1a2e;
+  border-bottom-color: #1a1a2e;
+  font-weight: 600;
+}
+
+.dark .view-tab:hover,
+.dark .view-tab.active {
+  color: #fafafa;
+}
+
+.dark .view-tab.active {
+  border-bottom-color: #fafafa;
+}
+
+/* Priority label styles */
+.priority-label {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.priority-critical {
+  background: #fecdd3;
+  color: #be123c;
+}
+
+.priority-high {
+  background: #fed7aa;
+  color: #c2410c;
+}
+
+.priority-medium {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.priority-low {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* Upgrade card gradient */
+.upgrade-card {
+  background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #e0e7ff 100%);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .upgrade-card {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+}
+
+.upgrade-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.1);
 }
