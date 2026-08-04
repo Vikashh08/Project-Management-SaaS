@@ -94,6 +94,7 @@ model User {
   activityLogs    ActivityLog[]
   timeLogs        TimeLog[]
   bookmarks       Bookmark[]
+  sentInvitations Invitation[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -110,6 +111,7 @@ model Organization {
   members         OrganizationMember[]
   teams           Team[]
   projects        Project[]
+  invitations     Invitation[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -137,6 +139,7 @@ model Team {
   
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   members         TeamMember[]
+  invitations     Invitation[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -396,4 +399,24 @@ model Bookmark {
   createdAt       DateTime @default(now())
 
   @@unique([userId, type, entityId])
+}
+
+model Invitation {
+  id              String   @id @default(uuid())
+  email           String
+  role            Role     @default(VIEWER)
+  token           String   @unique
+  status          String   @default("PENDING") // PENDING, ACCEPTED, EXPIRED
+
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  teamId          String?
+  team            Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  inviterId       String
+  inviter         User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
 }

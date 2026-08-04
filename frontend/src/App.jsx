@@ -11,6 +11,7 @@ import Calendar from './pages/Calendar';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AcceptInvite from './pages/AcceptInvite';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SocketProvider } from './context/SocketContext';
@@ -27,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/invite/:token" element={<AcceptInvite />} />
           
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>

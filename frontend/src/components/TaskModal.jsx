@@ -269,21 +269,21 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                       ))}
                     </div>
                     <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
-                      <form onSubmit={(e) => { e.preventDefault(); addCommentMutation.mutate(newComment); }} className="mt-4 flex space-x-3">
+                      <form onSubmit={(e) => { e.preventDefault(); addCommentMutation.mutate(commentText); }} className="mt-4 flex space-x-3">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
                           {/* We don't have current user readily available here without context, so just a placeholder icon or letter */}
                           <UserIcon className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
                           <textarea 
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
                             placeholder="Write a comment..."
                             className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-border-color rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none h-20"
                           />
                           <div className="mt-2 flex justify-end">
-                            <button type="submit" disabled={!newComment.trim() || addCommentMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
-                              Comment
+                            <button type="submit" disabled={!commentText.trim() || addCommentMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                              Post Comment
                             </button>
                           </div>
                         </div>

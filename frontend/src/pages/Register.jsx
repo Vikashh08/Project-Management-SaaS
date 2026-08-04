@@ -1,17 +1,19 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const { register: registerField, handleSubmit, formState: { errors }, watch } = useForm();
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const onSubmit = async (data) => {
     const success = await register(data.name, data.email, data.password);
     if (success) {
-      navigate('/');
+      const returnTo = location.state?.returnTo || '/';
+      navigate(returnTo);
     }
   };
 
