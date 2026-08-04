@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import TaskModal from '../components/TaskModal';
 import { useSocket } from '../context/SocketContext';
 import PermissionGate from '../components/PermissionGate';
+import Loader from '../components/Loader';
 
 const columns = [
   { id: 'TODO', title: 'To Do', color: 'bg-gray-200 dark:bg-gray-700' },
@@ -146,8 +147,25 @@ const Tasks = () => {
     mutationFn: async ({ id, status }) => {
       return api.put(`/tasks/${id}`, { status });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['tasks']);
+    onMutate: async (newTodo) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', selectedProjectId] });
+      const previousTasks = queryClient.getQueryData(['tasks', selectedProjectId]);
+      
+      queryClient.setQueryData(['tasks', selectedProjectId], old => {
+        if (!old) return old;
+        return old.map(task => 
+          task.id === newTodo.id ? { ...task, status: newTodo.status } : task
+        );
+      });
+      
+      return { previousTasks };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(['tasks', selectedProjectId], context.previousTasks);
+      toast.error('Failed to move task');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', selectedProjectId] });
     }
   });
 
@@ -169,7 +187,6 @@ const Tasks = () => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData('taskId');
     if (taskId) {
-      // Optimistic update could go here, but mutation is fast enough for MVP
       updateTaskMutation.mutate({ id: taskId, status });
     }
   };
@@ -226,28 +243,35 @@ const Tasks = () => {
               onDrop={(e) => handleDrop(e, col.id)}
             >
               {isLoading ? (
-                <div className="text-xs text-center mt-4 text-text-muted">Loading...</div>
+                <Loader />
               ) : (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ staggerChildren: 0.1 }}
                 >
-                  {tasks
-                    .filter((task) => task.status === col.id)
-                    .map((task) => (
-                      <motion.div
-                        key={task.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task.id)}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        whileHover={{ scale: 1.02 }}
-                        layout
-                      >
-                        <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
-                      </motion.div>
-                    ))}
+                  {tasks.filter((task) => task.status === col.id).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full min-h-[120px] opacity-60 text-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl m-1 mt-2">
+                      <p className="text-sm font-medium text-text-muted">Empty</p>
+                      <p className="text-xs text-text-muted mt-1">Drop a task here</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((task) => task.status === col.id)
+                      .map((task) => (
+                        <motion.div
+                          key={task.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, task.id)}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          whileHover={{ scale: 1.02 }}
+                          layout
+                        >
+                          <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
+                        </motion.div>
+                      ))
+                  )}
                 </motion.div>
               )}
             </div>
