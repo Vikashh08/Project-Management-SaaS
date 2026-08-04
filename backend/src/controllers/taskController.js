@@ -1,6 +1,7 @@
 const prisma = require('../utils/db');
 const { getIo } = require('../../server');
 const { logActivity } = require('../utils/activityLogger');
+const { createNotification } = require('./notificationController');
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -232,7 +233,7 @@ const addComment = async (req, res, next) => {
       },
       include: {
         author: { select: { id: true, name: true, avatarUrl: true } },
-        task: { select: { projectId: true } }
+        task: { select: { projectId: true, reporterId: true, title: true } }
       }
     });
 
@@ -243,6 +244,16 @@ const addComment = async (req, res, next) => {
     }
 
     await logActivity(req.user.id, 'ADDED_COMMENT', 'TASK', req.params.id, { commentSnippet: content.substring(0, 50) });
+
+    // Notify the reporter if the commenter is not the reporter
+    if (comment.task.reporterId !== req.user.id) {
+      await createNotification(
+        comment.task.reporterId,
+        'NEW_COMMENT',
+        `${req.user.name} commented on your task: ${comment.task.title}`,
+        `/tasks/${req.params.id}` // Frontend route to task
+      );
+    }
 
     res.status(201).json(comment);
   } catch (error) {
