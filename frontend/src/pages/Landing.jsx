@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, CheckCircle2, Play, Users, BarChart3, 
-  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap 
+  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap, LayoutDashboard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
