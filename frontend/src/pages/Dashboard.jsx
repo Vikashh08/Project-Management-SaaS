@@ -51,7 +51,8 @@ const Dashboard = () => {
     queryFn: async () => {
       const { data } = await api.get('/analytics');
       return data;
-    }
+    },
+    staleTime: 0, // Always refetch when invalidated (e.g. after task status change)
   });
 
   const { data: activities } = useQuery({

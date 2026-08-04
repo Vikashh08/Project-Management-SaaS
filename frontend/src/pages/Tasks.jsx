@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, MoreHorizontal, MessageSquare, Paperclip, Folder } from 'lucide-react';
+import { useSearchParams } from 'react-router';
 import api from '../utils/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -30,9 +31,20 @@ const PriorityBadge = ({ priority }) => {
   );
 };
 
+const statusBorderColors = {
+  TODO: '#9ca3af',
+  IN_PROGRESS: '#3b82f6',
+  REVIEW: '#a855f7',
+  DONE: '#22c55e',
+};
+
 const TaskCard = ({ task, onClick }) => {
   return (
-    <div className="saas-card p-4 mb-3 cursor-grab active:cursor-grabbing group" onClick={onClick}>
+    <div 
+      className="saas-card p-4 mb-3 cursor-grab active:cursor-grabbing group border-l-4"
+      style={{ borderLeftColor: statusBorderColors[task.status] || '#e5e7eb' }}
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start mb-3">
         <PriorityBadge priority={task.priority} />
         <button className="text-text-muted hover:text-text-color opacity-0 group-hover:opacity-100 transition-opacity">
@@ -66,9 +78,13 @@ const TaskCard = ({ task, onClick }) => {
 
 const Tasks = () => {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const initialProjectId = searchParams.get('projectId') || '';
+
   const [showModal, setShowModal] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
   
   const [newTask, setNewTask] = useState({ 
     title: '', 
@@ -166,6 +182,9 @@ const Tasks = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', selectedProjectId] });
+      queryClient.invalidateQueries({ queryKey: ['project'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
     }
   });
 
@@ -179,12 +198,18 @@ const Tasks = () => {
     e.dataTransfer.setData('taskId', taskId);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault(); // Allow dropping
+  const handleDragOver = (e, columnId) => {
+    e.preventDefault();
+    setDragOverColumn(columnId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverColumn(null);
   };
 
   const handleDrop = (e, status) => {
     e.preventDefault();
+    setDragOverColumn(null);
     const taskId = e.dataTransfer.getData('taskId');
     if (taskId) {
       updateTaskMutation.mutate({ id: taskId, status });
@@ -238,8 +263,13 @@ const Tasks = () => {
               </span>
             </div>
             <div 
-              className="flex-1 overflow-y-auto min-h-[200px] bg-black/5 dark:bg-white/5 rounded-2xl p-3 border border-transparent transition-colors hover:bg-black/10 dark:hover:bg-white/10"
-              onDragOver={handleDragOver}
+              className={`flex-1 overflow-y-auto min-h-[200px] rounded-2xl p-3 border-2 transition-all duration-150 ${
+                dragOverColumn === col.id
+                  ? 'border-primary bg-primary/5 scale-[1.01]'
+                  : 'border-transparent bg-black/5 dark:bg-white/5'
+              }`}
+              onDragOver={(e) => handleDragOver(e, col.id)}
+              onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, col.id)}
             >
               {isLoading ? (
