@@ -242,6 +242,31 @@ const toggleSubtask = async (req, res, next) => {
   }
 };
 
+// @desc    Delete an attachment
+// @route   DELETE /api/tasks/:id/attachments/:attachmentId
+// @access  Private
+const deleteAttachment = async (req, res, next) => {
+  try {
+    const attachment = await prisma.attachment.findUnique({
+      where: { id: req.params.attachmentId }
+    });
+
+    if (!attachment) {
+      res.status(404);
+      throw new Error('Attachment not found');
+    }
+
+    // In a real app, we would also delete the file from Cloudinary/Disk here
+    await prisma.attachment.delete({
+      where: { id: req.params.attachmentId }
+    });
+
+    res.json({ message: 'Attachment deleted' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createTask,
   getTasks,
@@ -251,4 +276,5 @@ module.exports = {
   addComment,
   addSubtask,
   toggleSubtask,
+  deleteAttachment,
 };

@@ -17,10 +17,16 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
 
     const { taskId, projectId } = req.body;
 
+    // Format URL for local storage if Cloudinary is not used
+    let fileUrl = req.file.path;
+    if (!fileUrl.startsWith('http')) {
+      fileUrl = `/uploads/${req.file.filename}`;
+    }
+
     // Save attachment record in DB
     const attachment = await prisma.attachment.create({
       data: {
-        url: req.file.path,
+        url: fileUrl,
         filename: req.file.originalname,
         size: req.file.size,
         type: req.file.mimetype,
