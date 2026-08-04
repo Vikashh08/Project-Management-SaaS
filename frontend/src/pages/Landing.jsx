@@ -1,15 +1,38 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
 import { 
   ArrowRight, CheckCircle2, Play, Users, BarChart3, 
-  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap, LayoutDashboard, Search
+  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap, LayoutDashboard, Search, X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Landing = () => {
-  const { user } = useAuth();
+  const { user, login, register } = useAuth();
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = React.useState(null);
+
+  const { register: loginRegister, handleSubmit: handleLoginSubmit, formState: { errors: loginErrors }, reset: resetLoginForm } = useForm();
+  const { register: registerRegister, handleSubmit: handleRegisterSubmit, formState: { errors: registerErrors }, watch: watchRegister, reset: resetRegisterForm } = useForm();
+
+  const onLoginSubmit = async (data) => {
+    const success = await login(data.email, data.password);
+    if (success) {
+      setShowAuthModal(null);
+      resetLoginForm();
+      navigate('/dashboard');
+    }
+  };
+
+  const onRegisterSubmit = async (data) => {
+    const success = await register(data.name, data.email, data.password);
+    if (success) {
+      setShowAuthModal(null);
+      resetRegisterForm();
+      navigate('/dashboard');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#fafafc] text-[#1a1a2e] font-sans selection:bg-primary/20 selection:text-primary">
@@ -38,23 +61,26 @@ const Landing = () => {
           <div className="flex items-center gap-4">
             {user ? (
               <button 
-                onClick={() => navigate('/')} 
-                className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/25 hover:shadow-primary/45 active:scale-[0.98] flex items-center gap-1.5"
+                onClick={() => navigate('/dashboard')} 
+                className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/25 hover:shadow-primary/45 active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
               >
                 Go to Dashboard
                 <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-semibold text-gray-700 hover:text-primary transition-colors">
+                <button 
+                  onClick={() => setShowAuthModal('login')} 
+                  className="text-sm font-semibold text-gray-700 hover:text-primary transition-colors cursor-pointer"
+                >
                   Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/25 hover:shadow-primary/45 active:scale-[0.98]"
+                </button>
+                <button 
+                  onClick={() => setShowAuthModal('register')} 
+                  className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/25 hover:shadow-primary/45 active:scale-[0.98] cursor-pointer"
                 >
                   Get Started
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -98,13 +124,23 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-wrap items-center justify-center gap-4 mb-20"
           >
-            <Link 
-              to={user ? '/' : '/register'}
-              className="px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 flex items-center gap-2 hover:-translate-y-0.5"
-            >
-              Request a Demo
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            {user ? (
+              <Link 
+                to="/dashboard"
+                className="px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 flex items-center gap-2 hover:-translate-y-0.5"
+              >
+                Go to Dashboard
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : (
+              <button 
+                onClick={() => setShowAuthModal('register')}
+                className="px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 flex items-center gap-2 hover:-translate-y-0.5 cursor-pointer"
+              >
+                Request a Demo
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
             <a 
               href="#features"
               className="px-8 py-4 bg-white text-gray-700 font-bold rounded-2xl hover:bg-gray-50 border border-gray-200 transition-all hover:-translate-y-0.5"
@@ -407,8 +443,8 @@ const Landing = () => {
           {/* Interactive Play Button Row */}
           <div className="flex justify-center mb-12">
             <button 
-              onClick={() => navigate('/login')}
-              className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all"
+              onClick={() => user ? navigate('/dashboard') : setShowAuthModal('login')}
+              className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all cursor-pointer"
             >
               <Play className="w-4 h-4 fill-white" />
               Play now
@@ -593,6 +629,152 @@ const Landing = () => {
           ))}
         </div>
       </section>
+
+      {/* Auth Modal Overlay */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.25 }}
+              className="bg-white p-8 rounded-3xl max-w-md w-full shadow-2xl relative border border-gray-100/50 text-left"
+            >
+              {/* Close button */}
+              <button 
+                onClick={() => setShowAuthModal(null)} 
+                className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <X className="w-4.5 h-4.5" />
+              </button>
+
+              {showAuthModal === 'login' ? (
+                /* LOGIN FORM */
+                <div>
+                  <div className="text-center mb-6">
+                    <div className="w-11 h-11 bg-primary rounded-xl mx-auto flex items-center justify-center mb-3 text-white font-bold text-lg shadow-md shadow-primary/20">
+                      T
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 font-sans">Welcome back</h3>
+                    <p className="text-xs text-gray-400 mt-1 font-sans">Please enter your details to sign in.</p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1 font-sans">Email Address</label>
+                      <input 
+                        type="email"
+                        {...loginRegister('email', { required: 'Email is required' })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-sm transition-all"
+                        placeholder="you@example.com"
+                      />
+                      {loginErrors.email && <p className="text-red-500 text-[10px] mt-1 font-semibold font-sans">{loginErrors.email.message}</p>}
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block text-xs font-semibold text-gray-700 font-sans">Password</label>
+                        <button type="button" className="text-[10px] text-primary font-bold hover:underline font-sans cursor-pointer">Forgot password?</button>
+                      </div>
+                      <input 
+                        type="password"
+                        {...loginRegister('password', { required: 'Password is required' })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-sm transition-all"
+                        placeholder="••••••••"
+                      />
+                      {loginErrors.password && <p className="text-red-500 text-[10px] mt-1 font-semibold font-sans">{loginErrors.password.message}</p>}
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/20 mt-2 cursor-pointer font-sans"
+                    >
+                      Sign In
+                    </button>
+                  </form>
+
+                  <p className="text-center text-xs text-gray-500 mt-6 font-medium font-sans">
+                    Don't have an account?{' '}
+                    <button 
+                      onClick={() => setShowAuthModal('register')} 
+                      className="text-primary font-bold hover:underline cursor-pointer font-sans"
+                    >
+                      Sign up
+                    </button>
+                  </p>
+                </div>
+              ) : (
+                /* REGISTER FORM */
+                <div>
+                  <div className="text-center mb-6">
+                    <div className="w-11 h-11 bg-primary rounded-xl mx-auto flex items-center justify-center mb-3 text-white font-bold text-lg shadow-md shadow-primary/20">
+                      T
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 font-sans">Create an account</h3>
+                    <p className="text-xs text-gray-400 mt-1 font-sans">Start managing your projects today.</p>
+                  </div>
+
+                  <form onSubmit={handleRegisterSubmit(onRegisterSubmit)} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1 font-sans">Full Name</label>
+                      <input 
+                        type="text"
+                        {...registerRegister('name', { required: 'Name is required' })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-sm transition-all"
+                        placeholder="John Doe"
+                      />
+                      {registerErrors.name && <p className="text-red-500 text-[10px] mt-1 font-semibold font-sans">{registerErrors.name.message}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1 font-sans">Email Address</label>
+                      <input 
+                        type="email"
+                        {...registerRegister('email', { required: 'Email is required' })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-sm transition-all"
+                        placeholder="you@example.com"
+                      />
+                      {registerErrors.email && <p className="text-red-500 text-[10px] mt-1 font-semibold font-sans">{registerErrors.email.message}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1 font-sans">Password</label>
+                      <input 
+                        type="password"
+                        {...registerRegister('password', { 
+                          required: 'Password is required',
+                          minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                        })}
+                        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-sm transition-all"
+                        placeholder="••••••••"
+                      />
+                      {registerErrors.password && <p className="text-red-500 text-[10px] mt-1 font-semibold font-sans">{registerErrors.password.message}</p>}
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/20 mt-2 cursor-pointer font-sans"
+                    >
+                      Create Account
+                    </button>
+                  </form>
+
+                  <p className="text-center text-xs text-gray-500 mt-6 font-medium font-sans">
+                    Already have an account?{' '}
+                    <button 
+                      onClick={() => setShowAuthModal('login')} 
+                      className="text-primary font-bold hover:underline cursor-pointer font-sans"
+                    >
+                      Sign in
+                    </button>
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <footer className="bg-white py-12 px-6 border-t border-gray-100">
