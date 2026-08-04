@@ -4,13 +4,15 @@ const { getIo } = require('../utils/socket');
 // ─── Get all teams in the org ─────────────────────────────────────────────────
 const getTeams = async (req, res, next) => {
   try {
-    const userMember = await prisma.organizationMember.findFirst({
+    const userMembers = await prisma.organizationMember.findMany({
       where: { userId: req.user.id }
     });
-    if (!userMember) return res.json([]);
+    if (!userMembers.length) return res.json([]);
+
+    const orgIds = userMembers.map(m => m.organizationId);
 
     const teams = await prisma.team.findMany({
-      where: { organizationId: userMember.organizationId },
+      where: { organizationId: { in: orgIds } },
       include: {
         lead: { select: { id: true, name: true, avatarUrl: true } },
         members: {
