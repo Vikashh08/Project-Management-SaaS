@@ -31,8 +31,22 @@ const registerUser = async (req, res, next) => {
         name,
         email,
         password: hashedPassword,
-        // Default role is VIEWER as per schema
+        role: 'ORG_ADMIN', // The creator of a new account is the Admin of their own workspace
       },
+    });
+
+    // Create a default organization for the new user
+    await prisma.organization.create({
+      data: {
+        name: `${name}'s Workspace`,
+        ownerId: user.id,
+        members: {
+          create: {
+            userId: user.id,
+            role: 'ORG_ADMIN'
+          }
+        }
+      }
     });
 
     if (user) {

@@ -1,5 +1,5 @@
 const prisma = require('../utils/db');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 // @desc    Get user activity
 // @route   GET /api/users/activity
 // @access  Private

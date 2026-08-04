@@ -85,7 +85,15 @@ const getTasks = async (req, res, next) => {
   try {
     const { projectId } = req.query;
 
-    const where = {};
+    const where = {
+      project: {
+        organization: {
+          members: {
+            some: { userId: req.user.id }
+          }
+        }
+      }
+    };
     if (projectId) {
       where.projectId = projectId;
     }

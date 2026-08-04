@@ -132,6 +132,8 @@ model OrganizationMember {
   joinedAt        DateTime @default(now())
 
   @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
 }
 
 model Team {
@@ -187,6 +189,9 @@ model Project {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([ownerId])
 }
 
 model ProjectMember {
@@ -233,6 +238,9 @@ model Task {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([reporterId])
 }
 
 model TaskAssignee {
@@ -246,6 +254,8 @@ model TaskAssignee {
   assignedAt      DateTime @default(now())
 
   @@unique([userId, taskId])
+  @@index([userId])
+  @@index([taskId])
 }
 
 model TaskDependency {
@@ -336,6 +346,9 @@ model Notification {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
 }
 
 model ActivityLog {
@@ -349,6 +362,10 @@ model ActivityLog {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityId])
+  @@index([createdAt])
 }
 
 model Label {
