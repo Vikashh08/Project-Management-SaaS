@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router';
 import { 
-  LayoutDashboard, CheckSquare, Users, BarChart3, Clock, Settings, 
+  LayoutDashboard, FolderOpen, CheckSquare, Users, BarChart3, Clock, Settings, 
   Search, HelpCircle, Activity, LogOut, ChevronRight, X, AlertTriangle
 } from 'lucide-react';
 import clsx from 'clsx';
@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Home', to: '/', badge: null },
+  { icon: FolderOpen, label: 'Projects', to: '/projects', badge: null },
   { icon: CheckSquare, label: 'Tasks', to: '/tasks', badge: null },
   { icon: Users, label: 'Teams', to: '/teams', badge: null },
   { icon: BarChart3, label: 'Analytics', to: '/analytics', badge: null },
