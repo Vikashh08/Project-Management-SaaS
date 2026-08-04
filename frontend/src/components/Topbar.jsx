@@ -14,7 +14,7 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
     const path = location.pathname;
     const segments = path.split('/').filter(Boolean);
     
-    if (segments.length === 0) return [{ label: 'Dashboard', to: '/' }];
+    if (segments.length === 0) return [{ label: 'Dashboard', to: '/dashboard' }];
     
     const breadcrumbs = [];
     let currentPath = '';
@@ -45,7 +45,7 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
         {/* Breadcrumbs */}
         <nav className="hidden md:flex items-center gap-1.5 text-sm">
           <Link 
-            to="/"
+            to="/dashboard"
             className="p-1 text-text-muted hover:text-primary transition-colors"
           >
             <Home className="w-4 h-4" />
@@ -73,7 +73,7 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
         <button 
           className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-text-muted hover:text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           title="Settings"
-          onClick={() => window.location.href = '/settings'}
+          onClick={() => window.location.href = '/dashboard/settings'}
         >
           <Settings className="w-4.5 h-4.5" />
         </button>

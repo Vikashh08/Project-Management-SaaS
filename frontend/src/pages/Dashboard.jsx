@@ -209,7 +209,7 @@ const Dashboard = () => {
          <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
           <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
             <h2 className="text-lg font-bold text-text-color">Recent Activity</h2>
-            <a href="/activity" className="text-sm text-primary hover:text-primary-dark font-medium transition-colors">View all</a>
+            <a href="/dashboard/activity" className="text-sm text-primary hover:text-primary-dark font-medium transition-colors">View all</a>
           </div>
           <div className="p-5">
             {activities?.length === 0 ? (
@@ -252,7 +252,7 @@ const Dashboard = () => {
             <p className="text-purple-200 text-sm mb-6 max-w-sm">
               Invite your teammates to collaborate, assign tasks, and track progress together in real-time.
             </p>
-            <a href="/teams" className="inline-block px-5 py-2.5 bg-white text-primary font-semibold rounded-xl shadow-sm hover:bg-gray-50 transition-colors text-sm">
+            <a href="/dashboard/teams" className="inline-block px-5 py-2.5 bg-white text-primary font-semibold rounded-xl shadow-sm hover:bg-gray-50 transition-colors text-sm">
               Invite Members
             </a>
           </div>

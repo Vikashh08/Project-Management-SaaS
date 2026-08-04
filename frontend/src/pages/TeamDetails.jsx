@@ -242,7 +242,7 @@ const TeamDetails = () => {
   if (error || !data) return (
     <div className="p-6 text-center">
       <p className="text-text-muted">Team not found.</p>
-      <button onClick={() => navigate('/teams')} className="mt-4 saas-button">Go Back</button>
+      <button onClick={() => navigate('/dashboard/teams')} className="mt-4 saas-button">Go Back</button>
     </div>
   );
 
@@ -264,7 +264,7 @@ const TeamDetails = () => {
     <div className="h-full overflow-y-auto">
       {/* Hero Header */}
       <div className="relative p-6 pb-0">
-        <button onClick={() => navigate('/teams')} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-color mb-4 transition-colors">
+        <button onClick={() => navigate('/dashboard/teams')} className="flex items-center gap-2 text-sm text-text-muted hover:text-text-color mb-4 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Teams
         </button>
 

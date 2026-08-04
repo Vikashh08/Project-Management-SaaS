@@ -40,13 +40,13 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
-          <Route path="/landing" element={<Landing />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/invite/:token" element={<AcceptInvite />} />
           
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<ProjectDetails />} />

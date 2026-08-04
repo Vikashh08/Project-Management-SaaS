@@ -8,14 +8,14 @@ import clsx from 'clsx';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Home', to: '/', badge: null },
-  { icon: FolderOpen, label: 'Projects', to: '/projects', badge: null },
-  { icon: CheckSquare, label: 'Tasks', to: '/tasks', badge: null },
-  { icon: Users, label: 'Teams', to: '/teams', badge: null },
-  { icon: BarChart3, label: 'Analytics', to: '/analytics', badge: null },
-  { icon: Clock, label: 'Timesheet', to: '/timesheet', badge: null },
-  { icon: Settings, label: 'Settings', to: '/settings', badge: null },
-  { icon: Activity, label: 'Activity', to: '/activity', badge: null },
+  { icon: LayoutDashboard, label: 'Home', to: '/dashboard', badge: null },
+  { icon: FolderOpen, label: 'Projects', to: '/dashboard/projects', badge: null },
+  { icon: CheckSquare, label: 'Tasks', to: '/dashboard/tasks', badge: null },
+  { icon: Users, label: 'Teams', to: '/dashboard/teams', badge: null },
+  { icon: BarChart3, label: 'Analytics', to: '/dashboard/analytics', badge: null },
+  { icon: Clock, label: 'Timesheet', to: '/dashboard/timesheet', badge: null },
+  { icon: Settings, label: 'Settings', to: '/dashboard/settings', badge: null },
+  { icon: Activity, label: 'Activity', to: '/dashboard/activity', badge: null },
 ];
 
 const Sidebar = ({ onClose, onSearchClick }) => {

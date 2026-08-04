@@ -64,9 +64,9 @@ const CommandPalette = ({ isOpen, onClose }) => {
       const selectedItem = flatResults[selectedIndex];
       if (selectedItem) {
         if (selectedItem.type === 'project') {
-          navigate('/projects'); // MVP: navigate to projects page
+          navigate('/dashboard/projects'); // MVP: navigate to projects page
         } else if (selectedItem.type === 'task') {
-          navigate('/tasks'); // MVP: navigate to tasks page
+          navigate('/dashboard/tasks'); // MVP: navigate to tasks page
         }
         onClose();
         setQuery('');
@@ -140,7 +140,7 @@ const CommandPalette = ({ isOpen, onClose }) => {
                     }`}
                     onMouseEnter={() => setSelectedIndex(index)}
                     onClick={() => {
-                      navigate(item.type === 'project' ? '/projects' : '/tasks');
+                      navigate(item.type === 'project' ? '/dashboard/projects' : '/dashboard/tasks');
                       onClose();
                       setQuery('');
                     }}

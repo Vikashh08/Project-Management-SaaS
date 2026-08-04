@@ -49,7 +49,7 @@ const ProjectDetails = () => {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <Link to="/projects" className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">
+            <Link to="/dashboard/projects" className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">
               <ArrowLeft className="w-5 h-5 text-text-muted" />
             </Link>
             <div>
@@ -61,7 +61,7 @@ const ProjectDetails = () => {
             </div>
           </div>
           <Link 
-            to={`/tasks?projectId=${project.id}`}
+            to={`/dashboard/tasks?projectId=${project.id}`}
             className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 text-sm"
           >
             <LayoutDashboard className="w-5 h-5" />
