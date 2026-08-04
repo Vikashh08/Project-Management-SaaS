@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
 
@@ -59,5 +61,8 @@
 @layer utilities {
   .saas-card {
     @apply bg-surface-color border border-border-color rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+  .saas-input {
+    @apply px-4 py-2 bg-surface-color border border-border-color rounded-lg text-text-color focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
 }

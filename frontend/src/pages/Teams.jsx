@@ -5,6 +5,7 @@ import { Users, Mail, Phone, MoreVertical, Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import PermissionGate from '../components/PermissionGate';
+import Loader from '../components/Loader';
 
 const Teams = () => {
   const queryClient = useQueryClient();
@@ -50,7 +51,7 @@ const Teams = () => {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-text-muted">Loading team members...</div>;
+    return <Loader text="Loading team members..." />;
   }
 
   return (

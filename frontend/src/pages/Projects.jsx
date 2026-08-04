@@ -5,6 +5,7 @@ import api from '../utils/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import PermissionGate from '../components/PermissionGate';
+import Loader from '../components/Loader';
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -100,7 +101,7 @@ const Projects = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-text-muted">Loading projects...</div>
+        <Loader text="Loading projects..." />
       ) : projects?.length === 0 ? (
         <div className="text-center py-20 text-text-muted">No projects found. Create one!</div>
       ) : (

@@ -36,8 +36,8 @@ const Register = () => {
             <input
               type="text"
               {...registerField('name', { required: 'Name is required' })}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="John Doe"
+              className="saas-input w-full"
+              placeholder="Enter your full name"
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
@@ -47,7 +47,7 @@ const Register = () => {
             <input
               type="email"
               {...registerField('email', { required: 'Email is required' })}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="saas-input w-full"
               placeholder="Enter your email"
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
@@ -61,7 +61,7 @@ const Register = () => {
                 required: 'Password is required',
                 minLength: { value: 6, message: 'Password must be at least 6 characters' }
               })}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="saas-input w-full"
               placeholder="••••••••"
             />
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}

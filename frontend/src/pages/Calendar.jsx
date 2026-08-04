@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../utils/api';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import Loader from '../components/Loader';
 
 const Calendar = () => {
   const { data: tasks, isLoading } = useQuery({
@@ -34,7 +36,7 @@ const Calendar = () => {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-text-muted">Loading calendar events...</div>;
+    return <Loader text="Loading calendar data..." />;
   }
 
   return (

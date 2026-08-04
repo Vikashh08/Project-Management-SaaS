@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import Loader from '../components/Loader';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -62,7 +63,7 @@ const Dashboard = () => {
   });
 
   if (isLoading) {
-    return <div className="p-6 text-text-color">Loading dashboard data...</div>;
+    return <Loader text="Loading dashboard data..." />;
   }
 
   // Task Status Distribution (Doughnut Chart)
