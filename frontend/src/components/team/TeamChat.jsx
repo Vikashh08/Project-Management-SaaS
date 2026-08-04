@@ -5,6 +5,7 @@ import { Send } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const TeamChat = ({ teamId }) => {
   const { user } = useAuth();
@@ -31,6 +32,10 @@ const TeamChat = ({ teamId }) => {
       setNewMessage('');
       // Invalidate queries as a fallback in case socket is delayed or misses
       queryClient.invalidateQueries(['teamMessages', teamId]);
+    },
+    onError: (err) => {
+      console.error('Message send error:', err);
+      toast.error(err.response?.data?.message || 'Failed to send message');
     }
   });
 

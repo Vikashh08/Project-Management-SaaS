@@ -292,7 +292,10 @@ const postTeamMessage = async (req, res, next) => {
     }
 
     res.status(201).json(message);
-  } catch (error) { next(error); }
+  } catch (error) {
+    require('fs').writeFileSync('/tmp/chat_error.log', String(error.stack || error));
+    next(error);
+  }
 };
 
 // ─── Get Team Files ───────────────────────────────────────────────────────────
