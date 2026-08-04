@@ -138,9 +138,26 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+// @desc    Get all users (for invite picker)
+// @route   GET /api/users/all
+// @access  Private
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: { id: { not: req.user.id } }, // Exclude self
+      select: { id: true, name: true, email: true, avatarUrl: true },
+      orderBy: { name: 'asc' },
+    });
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getUserActivity,
   getUserMetrics,
   updateProfile,
   changePassword,
+  getAllUsers,
 };
