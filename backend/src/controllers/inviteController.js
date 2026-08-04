@@ -13,6 +13,16 @@ const createInvite = async (req, res, next) => {
       throw new Error('Email and organization ID are required');
     }
 
+    // Verify inviter's permissions in this organization
+    const inviterMember = await prisma.organizationMember.findUnique({
+      where: { userId_organizationId: { userId: req.user.id, organizationId } }
+    });
+
+    if (!inviterMember || (inviterMember.role !== 'ORG_ADMIN' && inviterMember.role !== 'SUPER_ADMIN')) {
+      res.status(403);
+      throw new Error('You do not have permission to invite users to this organization');
+    }
+
     // Check if user is already a member
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -126,7 +136,69 @@ const acceptInvite = async (req, res, next) => {
   }
 };
 
+// @desc    Get pending invites for current user
+// @route   GET /api/invites/pending
+// @access  Private
+const getPendingInvites = async (req, res, next) => {
+  try {
+    const invites = await prisma.invitation.findMany({
+      where: {
+        email: req.user.email,
+        status: 'PENDING',
+        expiresAt: { gt: new Date() }
+      },
+      include: {
+        organization: {
+          select: { name: true }
+        },
+        inviter: {
+          select: { name: true, avatarUrl: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(invites);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Decline an invitation
+// @route   POST /api/invites/decline/:token
+// @access  Private
+const declineInvite = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+
+    const invitation = await prisma.invitation.findUnique({
+      where: { token }
+    });
+
+    if (!invitation) {
+      res.status(404);
+      throw new Error('Invitation not found');
+    }
+
+    if (invitation.email !== req.user.email) {
+      res.status(403);
+      throw new Error('Not authorized to decline this invitation');
+    }
+
+    await prisma.invitation.update({
+      where: { id: invitation.id },
+      data: { status: 'DECLINED' }
+    });
+
+    res.json({ message: 'Invitation declined' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createInvite,
-  acceptInvite
+  acceptInvite,
+  getPendingInvites,
+  declineInvite
 };

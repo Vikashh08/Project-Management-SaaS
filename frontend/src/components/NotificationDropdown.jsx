@@ -20,6 +20,16 @@ const NotificationDropdown = () => {
     refetchInterval: 60000 
   });
 
+  // Fetch pending invites
+  const { data: pendingInvites = [] } = useQuery({
+    queryKey: ['pendingInvites'],
+    queryFn: async () => {
+      const { data } = await api.get('/invites/pending');
+      return data;
+    },
+    refetchInterval: 60000 
+  });
+
   // Mark as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (id) => {
@@ -30,7 +40,23 @@ const NotificationDropdown = () => {
     }
   });
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const acceptInviteMutation = useMutation({
+    mutationFn: async (token) => api.post(`/invites/accept/${token}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['pendingInvites']);
+      // Optional: invalidate teams/organizations if needed, or simply reload
+      window.location.reload(); 
+    }
+  });
+
+  const declineInviteMutation = useMutation({
+    mutationFn: async (token) => api.post(`/invites/decline/${token}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['pendingInvites']);
+    }
+  });
+
+  const unreadCount = notifications.filter(n => !n.isRead).length + pendingInvites.length;
 
   // Handle outside click to close
   useEffect(() => {
@@ -79,13 +105,54 @@ const NotificationDropdown = () => {
             </div>
 
             <div className="max-h-96 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {notifications.length === 0 && pendingInvites.length === 0 ? (
                 <div className="p-6 text-center text-text-muted">
                   <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
                   <p className="text-sm">No notifications yet.</p>
                 </div>
               ) : (
-                notifications.map((notif) => (
+                <>
+                  {pendingInvites.map((invite) => (
+                    <div 
+                      key={invite.token}
+                      className="p-4 border-b border-border-color last:border-0 bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors flex gap-3"
+                    >
+                      <div className="mt-1">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full mt-1.5 shadow-[0_0_5px_rgba(99,102,241,0.5)]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-text-color">
+                          Workspace Invitation
+                        </p>
+                        <p className="text-xs text-text-muted mt-0.5">
+                          <strong>{invite.inviter?.name}</strong> invited you to join <strong>{invite.organization?.name}</strong>.
+                        </p>
+                        <div className="flex gap-2 mt-3">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              acceptInviteMutation.mutate(invite.token);
+                            }}
+                            disabled={acceptInviteMutation.isPending}
+                            className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition-colors"
+                          >
+                            Accept
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              declineInviteMutation.mutate(invite.token);
+                            }}
+                            disabled={declineInviteMutation.isPending}
+                            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-text-color text-xs font-medium rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {notifications.map((notif) => (
                   <div 
                     key={notif.id}
                     className={`p-4 border-b border-border-color last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex gap-3 ${!notif.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
@@ -115,7 +182,8 @@ const NotificationDropdown = () => {
                       </button>
                     )}
                   </div>
-                ))
+                ))}
+                </>
               )}
             </div>
             

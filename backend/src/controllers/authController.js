@@ -31,7 +31,7 @@ const registerUser = async (req, res, next) => {
         name,
         email,
         password: hashedPassword,
-        role: 'ORG_ADMIN', // The creator of a new account is the Admin of their own workspace
+        role: 'ORG_ADMIN', // Give them global ORG_ADMIN since they own the workspace
       },
     });
 

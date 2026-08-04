@@ -1,16 +1,23 @@
 const express = require('express');
-const { createInvite, acceptInvite } = require('../controllers/inviteController');
+const { createInvite, acceptInvite, getPendingInvites, declineInvite } = require('../controllers/inviteController');
 const { protect } = require('../middleware/authMiddleware');
-const { authorizeRoles } = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
-// Only Admins can invite
+// Invites creation (Role authorization is handled in the controller based on organization)
 router.route('/')
-  .post(protect, authorizeRoles('SUPER_ADMIN', 'ORG_ADMIN'), createInvite);
+  .post(protect, createInvite);
+
+// Get pending invites for the logged-in user
+router.route('/pending')
+  .get(protect, getPendingInvites);
 
 // Any authenticated user can accept an invite
 router.route('/accept/:token')
   .post(protect, acceptInvite);
+
+// Decline an invite
+router.route('/decline/:token')
+  .post(protect, declineInvite);
 
 module.exports = router;
