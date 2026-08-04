@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
     return <div className="min-h-screen flex items-center justify-center bg-bg-color">Loading...</div>;
   }
 
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return user ? <Outlet /> : <Navigate to="/landing" replace />;
 };
 
 export default ProtectedRoute;
