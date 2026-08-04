@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AcceptInvite from './pages/AcceptInvite';
+import ProjectDetails from './pages/ProjectDetails';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SocketProvider } from './context/SocketContext';
@@ -42,6 +43,7 @@ function App() {
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="projects" element={<Projects />} />
+              <Route path="projects/:id" element={<ProjectDetails />} />
               <Route path="tasks" element={<Tasks />} />
               <Route path="teams" element={<Teams />} />
               <Route path="calendar" element={<Calendar />} />
