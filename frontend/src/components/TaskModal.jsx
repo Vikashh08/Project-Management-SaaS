@@ -7,6 +7,7 @@ import { useSocket } from '../context/SocketContext';
 import { X, MessageSquare, CheckSquare, Clock, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import PermissionGate from './PermissionGate';
 
 const TaskModal = ({ isOpen, onClose, taskId }) => {
   const queryClient = useQueryClient();
@@ -170,7 +171,9 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-lg font-semibold text-text-color">Description</h3>
                       {!isEditingDesc && (
-                        <button onClick={() => setIsEditingDesc(true)} className="text-sm text-blue-600 hover:underline">Edit</button>
+                        <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
+                          <button onClick={() => setIsEditingDesc(true)} className="text-sm text-blue-600 hover:underline">Edit</button>
+                        </PermissionGate>
                       )}
                     </div>
                     {isEditingDesc ? (
@@ -230,18 +233,20 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                         </div>
                       ))}
                     </div>
-                    <form onSubmit={(e) => { e.preventDefault(); addSubtaskMutation.mutate(newSubtaskTitle); }} className="flex space-x-2">
-                      <input 
-                        type="text" 
-                        value={newSubtaskTitle}
-                        onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                        placeholder="Add a subtask..."
-                        className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-border-color rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                      />
-                      <button type="submit" disabled={!newSubtaskTitle.trim() || addSubtaskMutation.isPending} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-text-color rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700">
-                        Add
-                      </button>
-                    </form>
+                    <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
+                      <form onSubmit={(e) => { e.preventDefault(); addSubtaskMutation.mutate(newSubtaskTitle); }} className="flex space-x-2">
+                        <input 
+                          type="text" 
+                          value={newSubtaskTitle}
+                          onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                          placeholder="Add a subtask..."
+                          className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-border-color rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                        <button type="submit" disabled={!newSubtaskTitle.trim() || addSubtaskMutation.isPending} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-text-color rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700">
+                          Add
+                        </button>
+                      </form>
+                    </PermissionGate>
                   </section>
 
                   {/* Comments */}
@@ -263,24 +268,27 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                         </div>
                       ))}
                     </div>
-                    <form onSubmit={(e) => { e.preventDefault(); addCommentMutation.mutate(commentText); }} className="flex space-x-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                        <UserIcon className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <textarea 
-                          value={commentText}
-                          onChange={(e) => setCommentText(e.target.value)}
-                          placeholder="Write a comment..."
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-border-color rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none min-h-[80px]"
-                        />
-                        <div className="flex justify-end mt-2">
-                          <button type="submit" disabled={!commentText.trim() || addCommentMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
-                            Post Comment
-                          </button>
+                    <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
+                      <form onSubmit={(e) => { e.preventDefault(); addCommentMutation.mutate(newComment); }} className="mt-4 flex space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                          {/* We don't have current user readily available here without context, so just a placeholder icon or letter */}
+                          <UserIcon className="w-4 h-4" />
                         </div>
-                      </div>
-                    </form>
+                        <div className="flex-1">
+                          <textarea 
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Write a comment..."
+                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-border-color rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none h-20"
+                          />
+                          <div className="mt-2 flex justify-end">
+                            <button type="submit" disabled={!newComment.trim() || addCommentMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                              Comment
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </PermissionGate>
                   </section>
 
                   {/* Attachments */}
@@ -290,27 +298,28 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                       Attachments
                     </h3>
                     
-                    {/* Upload Zone */}
-                    <div className="mb-4">
-                      <label className="flex justify-center w-full h-24 px-4 transition bg-transparent border-2 border-gray-300 border-dashed rounded-xl appearance-none cursor-pointer hover:border-gray-400 focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <span className="flex items-center space-x-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                          </svg>
-                          <span className="font-medium text-gray-500">
-                            {uploadAttachmentMutation.isPending ? 'Uploading...' : 'Drop files to Attach, or browse'}
+                    <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
+                      <div className="mb-4">
+                        <label className="flex justify-center w-full h-24 px-4 transition bg-transparent border-2 border-gray-300 border-dashed rounded-xl appearance-none cursor-pointer hover:border-gray-400 focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800">
+                          <span className="flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span className="font-medium text-gray-500">
+                              {uploadAttachmentMutation.isPending ? 'Uploading...' : 'Drop files to Attach, or browse'}
+                            </span>
                           </span>
-                        </span>
-                        <input type="file" name="file" className="hidden" onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            const formData = new FormData();
-                            formData.append('file', e.target.files[0]);
-                            formData.append('taskId', taskId);
-                            uploadAttachmentMutation.mutate(formData);
-                          }
-                        }} disabled={uploadAttachmentMutation.isPending} />
-                      </label>
-                    </div>
+                          <input type="file" name="file" className="hidden" onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const formData = new FormData();
+                              formData.append('file', e.target.files[0]);
+                              formData.append('taskId', taskId);
+                              uploadAttachmentMutation.mutate(formData);
+                            }
+                          }} disabled={uploadAttachmentMutation.isPending} />
+                        </label>
+                      </div>
+                    </PermissionGate>
 
                     {/* Gallery */}
                     {task?.attachments?.length > 0 && (

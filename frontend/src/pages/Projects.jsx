@@ -4,6 +4,7 @@ import { Plus, Folder, MoreVertical } from 'lucide-react';
 import api from '../utils/api';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import PermissionGate from '../components/PermissionGate';
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -87,13 +88,15 @@ const Projects = () => {
           <h1 className="text-2xl font-bold text-text-color">Projects</h1>
           <p className="text-text-muted text-sm mt-1">Manage and track your team's projects</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Project
-        </button>
+        <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD']}>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Project
+          </button>
+        </PermissionGate>
       </div>
 
       {isLoading ? (

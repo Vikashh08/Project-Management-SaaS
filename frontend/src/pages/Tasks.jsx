@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import TaskModal from '../components/TaskModal';
 import { useSocket } from '../context/SocketContext';
+import PermissionGate from '../components/PermissionGate';
 
 const columns = [
   { id: 'TODO', title: 'To Do', color: 'bg-gray-200 dark:bg-gray-700' },
@@ -196,16 +197,18 @@ const Tasks = () => {
             </select>
           </div>
         </div>
-        <button 
-          onClick={() => {
-            setNewTask(prev => ({ ...prev, projectId: selectedProjectId || (projects[0]?.id || '') }));
-            setShowModal(true);
-          }}
-          className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors shadow-sm shadow-primary/20"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Task
-        </button>
+        <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'QA_TESTER']}>
+          <button 
+            onClick={() => {
+              setNewTask(prev => ({ ...prev, projectId: selectedProjectId || (projects[0]?.id || '') }));
+              setShowModal(true);
+            }}
+            className="saas-button flex items-center space-x-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>New Task</span>
+          </button>
+        </PermissionGate>
       </div>
 
       <div className="flex-1 overflow-x-auto flex space-x-6 pb-4">
