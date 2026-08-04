@@ -9,6 +9,8 @@ const {
   addSubtask,
   toggleSubtask,
   deleteAttachment,
+  assignTask,
+  unassignTask,
 } = require('../controllers/taskController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
@@ -38,5 +40,11 @@ router.route('/:id/subtasks/:subtaskId')
 
 router.route('/:id/attachments/:attachmentId')
   .delete(protect, canManageTasks, deleteAttachment);
+
+router.route('/:id/assign')
+  .post(protect, canManageTasks, assignTask);
+
+router.route('/:id/assign/:userId')
+  .delete(protect, canManageTasks, unassignTask);
 
 module.exports = router;

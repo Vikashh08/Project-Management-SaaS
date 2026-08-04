@@ -364,6 +364,77 @@ const deleteAttachment = async (req, res, next) => {
     next(error);
   }
 };
+// @desc    Assign user to task
+// @route   POST /api/tasks/:id/assign
+// @access  Private
+const assignTask = async (req, res, next) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(400);
+      throw new Error('User ID is required');
+    }
+
+    const taskAssignee = await prisma.taskAssignee.create({
+      data: {
+        taskId: req.params.id,
+        userId: userId
+      },
+      include: {
+        task: true
+      }
+    });
+
+    try {
+      if (taskAssignee.task && taskAssignee.task.projectId) {
+        getIo().to(`project_${taskAssignee.task.projectId}`).emit('TASK_UPDATED', { id: req.params.id });
+      }
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
+
+    res.status(201).json(taskAssignee);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      res.status(400);
+      return next(new Error('User is already assigned to this task'));
+    }
+    next(error);
+  }
+};
+
+// @desc    Unassign user from task
+// @route   DELETE /api/tasks/:id/assign/:userId
+// @access  Private
+const unassignTask = async (req, res, next) => {
+  try {
+    const { id, userId } = req.params;
+
+    const taskAssignee = await prisma.taskAssignee.delete({
+      where: {
+        userId_taskId: {
+          userId: userId,
+          taskId: id
+        }
+      },
+      include: {
+        task: true
+      }
+    });
+
+    try {
+      if (taskAssignee.task && taskAssignee.task.projectId) {
+        getIo().to(`project_${taskAssignee.task.projectId}`).emit('TASK_UPDATED', { id: id });
+      }
+    } catch (e) {
+      console.error('Socket error:', e);
+    }
+
+    res.json({ message: 'User unassigned successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   createTask,
@@ -375,4 +446,6 @@ module.exports = {
   addSubtask,
   toggleSubtask,
   deleteAttachment,
+  assignTask,
+  unassignTask,
 };

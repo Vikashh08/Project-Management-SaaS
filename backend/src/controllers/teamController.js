@@ -5,8 +5,17 @@ const prisma = require('../utils/db');
 // @access  Private
 const getOrganizationMembers = async (req, res) => {
   try {
-    const { organizationId } = req.query; // Fallback to query
-    const orgId = organizationId || 'org-123'; // Hardcoded for demo if missing
+    let orgId = req.query.organizationId;
+    
+    if (!orgId) {
+      const userMember = await prisma.organizationMember.findFirst({
+        where: { userId: req.user.id }
+      });
+      if (!userMember) {
+        return res.json([]); // User has no organization yet
+      }
+      orgId = userMember.organizationId;
+    }
 
     const members = await prisma.organizationMember.findMany({
       where: {

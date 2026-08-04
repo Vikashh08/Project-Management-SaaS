@@ -94,6 +94,36 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
     }
   });
 
+  const assignMutation = useMutation({
+    mutationFn: async (userId) => api.post(`/tasks/${taskId}/assign`, { userId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['task', taskId]);
+      queryClient.invalidateQueries(['tasks']);
+      toast.success('User assigned');
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to assign')
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: async (userId) => api.delete(`/tasks/${taskId}/assign/${userId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['task', taskId]);
+      queryClient.invalidateQueries(['tasks']);
+      toast.success('User unassigned');
+    }
+  });
+
+  const { data: orgMembers } = useQuery({
+    queryKey: ['orgMembers'],
+    queryFn: async () => {
+      const { data } = await api.get('/teams/organization');
+      return data;
+    },
+    enabled: isOpen
+  });
+
+  const [showAssignDropdown, setShowAssignDropdown] = useState(false);
+
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -357,20 +387,63 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                     <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">Details</h4>
                     
                     <div className="space-y-4">
-                      <div>
-                        <span className="text-xs text-text-muted block mb-1">Assignee</span>
-                        <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <span className="text-xs text-text-muted block mb-1">Assignees</span>
+                        <div className="flex flex-wrap items-center gap-2">
                           {task?.assignees?.length > 0 ? (
                             task.assignees.map(a => (
-                              <div key={a.id} className="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded shadow-sm">
+                              <div key={a.id} className="flex items-center bg-white dark:bg-gray-700 px-2 py-1 rounded shadow-sm group">
                                 <img src={a.user.avatarUrl || `https://i.pravatar.cc/150?u=${a.user.id}`} alt="avatar" className="w-5 h-5 rounded-full mr-2" />
-                                <span className="text-sm font-medium">{a.user.name}</span>
+                                <span className="text-sm font-medium mr-1">{a.user.name}</span>
+                                <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD']}>
+                                  <button onClick={() => unassignMutation.mutate(a.userId)} className="opacity-0 group-hover:opacity-100 text-red-500 ml-1">
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </PermissionGate>
                               </div>
                             ))
                           ) : (
                             <span className="text-sm text-text-muted">Unassigned</span>
                           )}
+                          <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD']}>
+                            <button onClick={() => setShowAssignDropdown(!showAssignDropdown)} className="w-7 h-7 rounded-full border border-dashed border-gray-400 dark:border-gray-600 flex items-center justify-center text-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 ml-1 transition-colors">
+                              +
+                            </button>
+                          </PermissionGate>
                         </div>
+                        
+                        <AnimatePresence>
+                          {showAssignDropdown && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 5 }}
+                              className="absolute top-full left-0 mt-2 w-56 bg-surface-color border border-border-color rounded-xl shadow-xl z-50 p-2 max-h-48 overflow-y-auto"
+                            >
+                              <div className="text-xs font-semibold text-text-muted mb-2 px-2 uppercase tracking-wider">Organization Members</div>
+                              {orgMembers?.map(member => {
+                                const isAssigned = task?.assignees?.some(a => a.userId === member.userId);
+                                if (isAssigned) return null;
+                                return (
+                                  <button 
+                                    key={member.id}
+                                    onClick={() => {
+                                      assignMutation.mutate(member.userId);
+                                      setShowAssignDropdown(false);
+                                    }}
+                                    className="w-full text-left px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm flex items-center transition-colors"
+                                  >
+                                    <img src={member.user.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="avatar" className="w-6 h-6 rounded-full mr-3 border border-border-color" />
+                                    <span className="font-medium text-text-color truncate">{member.user.name}</span>
+                                  </button>
+                                );
+                              })}
+                              {orgMembers?.filter(m => !task?.assignees?.some(a => a.userId === m.userId)).length === 0 && (
+                                <div className="text-xs text-text-muted text-center py-2">All members are assigned.</div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       <div>
