@@ -39,10 +39,8 @@ const CreateTaskModal = ({ isOpen, onClose, defaultProjectId }) => {
       return res;
     },
     onMutate: async (newTask) => {
-      // Cancel any outgoing refetches so they don't overwrite our optimistic update
-      await queryClient.cancelQueries(['tasks']);
+      await queryClient.cancelQueries({ queryKey: ['tasks'] });
       const previousTasks = queryClient.getQueryData(['tasks']);
-      // Optimistically add the new task to the list immediately
       queryClient.setQueryData(['tasks'], (old = []) => [
         { id: `temp-${Date.now()}`, ...newTask, status: 'TODO', assignees: [], createdAt: new Date().toISOString() },
         ...(Array.isArray(old) ? old : [])
