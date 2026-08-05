@@ -416,4 +416,4 @@ Please do not commit the `.env` file or any secrets to the repository.
 
 ---
 
-Built by Vikash Kumar.
+Built by Vikash Kumar, Sunny Kumar, Rohit Gussain and Ajay Razz
