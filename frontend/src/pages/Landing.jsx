@@ -122,7 +122,7 @@ const Landing = () => {
                 </button>
 
                 <button 
-                  onClick={() => setShowAuthModal('register')} 
+                  onClick={() => navigate('/register')} 
                   className="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-md shadow-primary/25 hover:shadow-primary/45 active:scale-[0.98] cursor-pointer"
                 >
                   Get Started
@@ -190,7 +190,7 @@ const Landing = () => {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button 
-                  onClick={() => setShowAuthModal('register')}
+                  onClick={() => navigate('/register')}
                   className="px-8 py-4 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-bold rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-white/10 transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   Create Account
@@ -494,7 +494,7 @@ const Landing = () => {
           {/* Interactive Play Button Row */}
           <div className="flex justify-center mb-12">
             <button 
-              onClick={() => user ? navigate('/dashboard') : setShowAuthModal('login')}
+              onClick={() => user ? navigate('/dashboard') : navigate('/login')}
               className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all cursor-pointer"
             >
               <Play className="w-4 h-4 fill-white" />
