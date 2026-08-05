@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+
 import {
   ArrowLeft, Users, CheckCircle2, Clock, TrendingUp, Settings, UserPlus,
   Trash2, X, Search, UserCheck, Star, Mail, Activity, Shield, Plus
