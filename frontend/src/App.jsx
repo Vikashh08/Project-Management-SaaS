@@ -51,33 +51,33 @@ function App() {
         <AuthProvider>
           <SocketProvider>
 
-      <BrowserRouter>
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/invite/:token" element={<AcceptInvite />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="projects" element={<Projects />} />
-              <Route path="projects/:id" element={<ProjectDetails />} />
-              <Route path="tasks" element={<Tasks />} />
-              <Route path="teams" element={<TeamsPage />} />
-              <Route path="teams/:id" element={<TeamDetails />} />
-              <Route path="calendar" element={<Calendar />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="activity" element={<Activity />} />
-              <Route path="timesheet" element={<Timesheet />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-        </SocketProvider>
-      </AuthProvider>
+            <BrowserRouter>
+              <Toaster position="top-right" />
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/invite/:token" element={<AcceptInvite />} />
+
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/dashboard" element={<DashboardLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="projects" element={<Projects />} />
+                    <Route path="projects/:id" element={<ProjectDetails />} />
+                    <Route path="tasks" element={<Tasks />} />
+                    <Route path="teams" element={<TeamsPage />} />
+                    <Route path="teams/:id" element={<TeamDetails />} />
+                    <Route path="calendar" element={<Calendar />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="activity" element={<Activity />} />
+                    <Route path="timesheet" element={<Timesheet />} />
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </SocketProvider>
+        </AuthProvider>
       </ClerkProvider>
     </QueryClientProvider>
   );

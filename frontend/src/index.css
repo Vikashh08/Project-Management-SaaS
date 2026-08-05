@@ -10,14 +10,14 @@
   --color-primary-dark: #047857;
   --color-primary-light: #34d399;
   --color-primary-hover: #047857;
-  
+
   /* Crisp Light Mode */
   --color-background: #f0fdf4;
   --color-surface: #ffffff;
   --color-text: #064e3b;
   --color-text-muted: #4b5563;
   --color-border: #d1fae5;
-  
+
   /* Sleek Dark Mode */
   --color-dark-background: #022c22;
   --color-dark-surface: #064e3b;
@@ -65,9 +65,11 @@
   .saas-card {
     @apply bg-surface-color border border-border-color rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200;
   }
+
   .saas-input {
     @apply px-4 py-2 bg-surface-color border border-border-color rounded-lg text-text-color focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed;
   }
+
   .saas-button {
     @apply px-5 py-2.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.97];
   }
@@ -157,12 +159,15 @@
 .kanban-column-todo {
   background: linear-gradient(180deg, #fef9c3 0%, #fef9c310 100%);
 }
+
 .kanban-column-inprogress {
   background: linear-gradient(180deg, #fed7aa 0%, #fed7aa10 100%);
 }
+
 .kanban-column-review {
   background: linear-gradient(180deg, #e9d5ff 0%, #e9d5ff10 100%);
 }
+
 .kanban-column-done {
   background: linear-gradient(180deg, #bbf7d0 0%, #bbf7d010 100%);
 }
@@ -253,4 +258,3 @@
   border-radius: 50%;
   background: rgba(5, 150, 105, 0.15);
 }
-
