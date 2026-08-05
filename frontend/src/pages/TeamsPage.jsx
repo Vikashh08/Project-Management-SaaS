@@ -122,13 +122,14 @@ const TeamCard = ({ team, onEdit, onDelete }) => {
 
       {/* Footer */}
       <Link
-        to={`/teams/${team.id}`}
+        to={`/dashboard/teams/${team.id}`}
         className="flex items-center justify-between mt-auto pt-4 border-t border-border-color text-sm font-semibold text-primary hover:gap-2 transition-all group/link"
       >
         Open Team Dashboard
         <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
       </Link>
     </motion.div>
+
   );
 };
 

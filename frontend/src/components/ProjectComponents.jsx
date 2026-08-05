@@ -37,7 +37,7 @@ export const ProjectCard = ({ project, onEdit, onDelete }) => {
   return (
     <div className="saas-card p-5 h-full flex flex-col group relative">
       <div className="flex justify-between items-start mb-4">
-        <Link to={`/projects/${project.id}`} className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-light group-hover:scale-110 transition-transform duration-300">
+        <Link to={`/dashboard/projects/${project.id}`} className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-light group-hover:scale-110 transition-transform duration-300">
           <Folder className="w-6 h-6" />
         </Link>
         <div className="relative" ref={menuRef}>
@@ -57,14 +57,14 @@ export const ProjectCard = ({ project, onEdit, onDelete }) => {
                 className="absolute right-0 top-8 z-50 w-48 bg-surface-color border border-border-color rounded-xl shadow-xl py-1.5 overflow-hidden"
               >
                 <Link
-                  to={`/projects/${project.id}`}
+                  to={`/dashboard/projects/${project.id}`}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-color hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4 text-text-muted" /> View Dashboard
                 </Link>
                 <Link
-                  to={`/tasks?projectId=${project.id}`}
+                  to={`/dashboard/tasks?projectId=${project.id}`}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-color hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
@@ -90,7 +90,8 @@ export const ProjectCard = ({ project, onEdit, onDelete }) => {
           </AnimatePresence>
         </div>
       </div>
-      <Link to={`/projects/${project.id}`} className="flex-1 flex flex-col min-h-0">
+      <Link to={`/dashboard/projects/${project.id}`} className="flex-1 flex flex-col min-h-0">
+
         <h3 className="text-lg font-bold text-text-color mb-1 group-hover:text-primary transition-colors">{project.name}</h3>
         <p className="text-sm text-text-muted mb-4 line-clamp-2">{project.description || 'No description provided.'}</p>
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">

@@ -195,12 +195,13 @@ const TeamDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
   const [showAddMember, setShowAddMember] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Get current user from token
-  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const storedUser = currentUser || JSON.parse(localStorage.getItem('userInfo') || '{}');
+
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['team', id],
@@ -436,8 +437,8 @@ const TeamDetails = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-bold text-text-color">Team Projects</h2>
               <div className="flex items-center gap-3">
-                <Link to={`/tasks?teamId=${id}`} className="saas-button bg-surface-color text-text-color border border-border-color hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm py-2">
-                  <CheckCircle2 className="w-4 h-4" /> Team Kanban Board
+                <Link to={`/dashboard/tasks?teamId=${id}`} className="saas-button bg-surface-color text-text-color border border-border-color hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 text-sm py-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" /> Team Tasks
                 </Link>
                 <PermissionGate allowedRoles={['SUPER_ADMIN', 'ORG_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD']}>
                   <button onClick={() => setShowProjectModal(true)} className="saas-button flex items-center gap-2 text-sm py-2">
