@@ -5,25 +5,26 @@
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Modern Electric Indigo & Cyan Primary Theme for ProjectDock */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-light: #60a5fa;
-  --color-primary-hover: #1d4ed8;
+  /* Emerald Cyan / Deep Forest Teal Theme for ProjectDock */
+  --color-primary: #059669;
+  --color-primary-dark: #047857;
+  --color-primary-light: #34d399;
+  --color-primary-hover: #047857;
   
   /* Crisp Light Mode */
-  --color-background: #f8fafc;
+  --color-background: #f0fdf4;
   --color-surface: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --color-border: #e2e8f0;
+  --color-text: #064e3b;
+  --color-text-muted: #4b5563;
+  --color-border: #d1fae5;
   
   /* Sleek Dark Mode */
-  --color-dark-background: #0b0f17;
-  --color-dark-surface: #131b2e;
-  --color-dark-text: #f8fafc;
-  --color-dark-text-muted: #94a3b8;
-  --color-dark-border: #1e293b;
+  --color-dark-background: #022c22;
+  --color-dark-surface: #064e3b;
+  --color-dark-text: #ecfdf5;
+  --color-dark-text-muted: #a7f3d0;
+  --color-dark-border: #047857;
+
 
   /* Tailwind CSS Utility Aliases */
   --color-bg-color: var(--bg-color);
@@ -90,7 +91,7 @@
   justify-content: center;
   font-size: 10px;
   font-weight: 700;
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  background: linear-gradient(135deg, #34d399, #059669);
   color: white;
   flex-shrink: 0;
   position: relative;
@@ -117,7 +118,7 @@
   justify-content: center;
   font-size: 10px;
   font-weight: 700;
-  background: #7c3aed;
+  background: #059669;
   color: white;
   flex-shrink: 0;
 }
@@ -126,12 +127,12 @@
 .sidebar-redesign {
   background: #ffffff;
   border-radius: 0 24px 24px 0;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 4px 0 24px rgba(5, 150, 105, 0.08);
 }
 
 .dark .sidebar-redesign {
-  background: #121212;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  background: #064e3b;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Custom scrollbar */
@@ -144,12 +145,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #a7f3d0;
   border-radius: 999px;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #047857;
 }
 
 /* Kanban column backgrounds */
@@ -174,7 +175,7 @@
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: #4b5563;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
   cursor: pointer;
@@ -182,22 +183,22 @@
 }
 
 .view-tab:hover {
-  color: #1a1a2e;
+  color: #064e3b;
 }
 
 .view-tab.active {
-  color: #1a1a2e;
-  border-bottom-color: #1a1a2e;
+  color: #059669;
+  border-bottom-color: #059669;
   font-weight: 600;
 }
 
 .dark .view-tab:hover,
 .dark .view-tab.active {
-  color: #fafafa;
+  color: #ecfdf5;
 }
 
 .dark .view-tab.active {
-  border-bottom-color: #fafafa;
+  border-bottom-color: #34d399;
 }
 
 /* Priority label styles */
@@ -232,14 +233,14 @@
 
 /* Upgrade card gradient */
 .upgrade-card {
-  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #e0f2fe 100%);
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 50%, #a7f3d0 100%);
   border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
 
 .dark .upgrade-card {
-  background: linear-gradient(135deg, #172554 0%, #1e3a8a 50%, #0f172a 100%);
+  background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #022c22 100%);
 }
 
 .upgrade-card::before {
@@ -250,5 +251,6 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(5, 150, 105, 0.15);
 }
+

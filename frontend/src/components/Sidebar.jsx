@@ -28,13 +28,14 @@ const Sidebar = ({ onClose, onSearchClick }) => {
       <div className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white">
+            <div className="w-9 h-9 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 text-white">
               <Anchor className="w-5 h-5" />
             </div>
             <span className="font-bold text-lg tracking-tight text-text-color">
               Project<span className="text-primary">Dock</span>
             </span>
           </div>
+
 
           <button 
             onClick={onClose}
