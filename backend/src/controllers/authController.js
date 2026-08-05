@@ -172,9 +172,68 @@ const updateUserProfile = async (req, res, next) => {
   }
 };
 
+// @desc    1-Click Guest Login / Demo Account access
+// @route   POST /api/auth/guest
+// @access  Public
+const guestLogin = async (req, res, next) => {
+  try {
+    const guestEmail = 'guest.demo@taskflowai.com';
+    let user = await prisma.user.findUnique({
+      where: { email: guestEmail },
+    });
+
+    if (!user) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash('GuestDemoPass123!', salt);
+
+      user = await prisma.user.create({
+        data: {
+          name: 'Demo Guest',
+          email: guestEmail,
+          password: hashedPassword,
+          role: 'ORG_ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+
+      // Create guest workspace
+      await prisma.organization.create({
+        data: {
+          name: "Demo Guest's Workspace",
+          ownerId: user.id,
+          members: {
+            create: {
+              userId: user.id,
+              role: 'ORG_ADMIN',
+            },
+          },
+        },
+      });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() },
+    });
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isGuest: true,
+      token: generateToken(user.id),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  guestLogin,
   getUserProfile,
   updateUserProfile,
 };
+

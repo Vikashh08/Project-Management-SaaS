@@ -44,6 +44,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const guestLogin = async () => {
+    try {
+      const { data } = await api.post('/auth/guest');
+      setUser(data);
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      toast.success('Logged in as Guest!');
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Guest login failed');
+      return false;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('userInfo');
@@ -51,8 +64,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, guestLogin, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
+

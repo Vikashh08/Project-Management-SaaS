@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../context/AuthContext';
+import { Sparkles, ArrowRight, UserCheck, Lock, Mail, ShieldCheck } from 'lucide-react';
+
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
 
   const onSubmit = async (data) => {
     const success = await login(data.email, data.password);
@@ -17,60 +20,125 @@ const Login = () => {
     }
   };
 
+  const handleGuestAccess = async () => {
+    setIsGuestLoading(true);
+    const success = await guestLogin();
+    setIsGuestLoading(false);
+    if (success) {
+      const returnTo = location.state?.returnTo || '/dashboard';
+      navigate(returnTo);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-color px-4">
-      <div className="max-w-md w-full bg-surface-color p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl mx-auto flex items-center justify-center mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-[#09090b] px-4 py-8 text-gray-900 dark:text-white transition-colors duration-300">
+      <div className="max-w-md w-full bg-white dark:bg-[#121216] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-white/10 relative overflow-hidden">
+        
+        {/* Header Badge */}
+        <div className="text-center mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg shadow-primary/25">
             <span className="text-white font-bold text-2xl leading-none">T</span>
           </div>
-          <h2 className="text-2xl font-bold text-text-color">Welcome back</h2>
-          <p className="text-text-muted mt-2">Please enter your details to sign in.</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Welcome to TaskFlow<span className="text-primary">AI</span></h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Sign in to access your projects or try Instant Guest Demo</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {/* 1-CLICK INSTANT GUEST DEMO ACCESS (PROMINENT TOP CARD) */}
+        <div className="mb-6 bg-gradient-to-r from-primary/10 via-indigo-500/10 to-purple-500/10 border border-primary/20 dark:border-primary/30 p-4 rounded-2xl">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-xs font-bold text-primary tracking-wide uppercase">Instant Access</span>
+            <span className="ml-auto text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">No Password</span>
+          </div>
+          <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+            Want to test drive TaskFlowAI immediately? Explore full workspace features as a Guest Demo User in 1 click.
+          </p>
+          <button
+            type="button"
+            onClick={handleGuestAccess}
+            disabled={isGuestLoading}
+            className="w-full py-2.5 px-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-xs shadow-md shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {isGuestLoading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <UserCheck className="w-4 h-4" />
+                <span>Explore as Demo Guest</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* OR Divider */}
+        <div className="relative my-6 text-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-white/10"></div>
+          </div>
+          <span className="relative bg-white dark:bg-[#121216] px-3 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            Or sign in with account
+          </span>
+        </div>
+
+        {/* Regular Login Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-text-color mb-1">Email address</label>
-            <input
-              type="email"
-              {...register('email', { required: 'Email is required' })}
-              className="saas-input w-full"
-              placeholder="Enter your email"
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+            <div className="relative">
+              <input
+                type="email"
+                {...register('email', { required: 'Email is required' })}
+                className="w-full pl-9 pr-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-xs text-gray-900 dark:text-white transition-all"
+                placeholder="you@example.com"
+              />
+              <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+            </div>
+            {errors.email && <p className="text-red-500 text-[10px] mt-1 font-semibold">{errors.email.message}</p>}
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-text-color">Password</label>
-              <a href="#" className="text-xs text-blue-600 hover:underline">Forgot password?</a>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300">Password</label>
+              <a href="#" className="text-[10px] text-primary font-bold hover:underline">Forgot password?</a>
             </div>
-            <input
-              type="password"
-              {...register('password', { required: 'Password is required' })}
-              className="saas-input w-full"
-              placeholder="••••••••"
-            />
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+            <div className="relative">
+              <input
+                type="password"
+                {...register('password', { required: 'Password is required' })}
+                className="w-full pl-9 pr-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none text-xs text-gray-900 dark:text-white transition-all"
+                placeholder="••••••••"
+              />
+              <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+            </div>
+            {errors.password && <p className="text-red-500 text-[10px] mt-1 font-semibold">{errors.password.message}</p>}
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors"
+            className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer mt-1"
           >
-            Sign in
+            Sign In with Account
           </button>
         </form>
 
-        <p className="text-center text-sm text-text-muted mt-6">
+        <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6 font-medium">
           Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-semibold hover:underline">
-            Sign up
+          <Link to="/register" className="text-primary font-bold hover:underline">
+            Sign up free
           </Link>
         </p>
+
+
+        {/* Security Footer Note */}
+        <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-center gap-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span>Encrypted Session & Instant Guest Preview Enabled</span>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Login;
+
