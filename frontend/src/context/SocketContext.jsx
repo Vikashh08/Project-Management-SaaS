@@ -13,33 +13,41 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    if (user) {
-      const newSocket = io('http://localhost:5001'); // Use env var in prod
+    if (!user?.id) return;
 
-      newSocket.on('connect', () => {
-        newSocket.emit('setup', user.id);
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:5001');
+    const newSocket = io(socketUrl, {
+      transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+    });
+
+    newSocket.on('connect', () => {
+      newSocket.emit('setup', user.id);
+    });
+
+    newSocket.on('online_users', (users) => {
+      setOnlineUsers(users);
+    });
+
+    newSocket.on('new_notification', (notification) => {
+      toast(notification.content, {
+        icon: '🔔',
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
       });
+    });
 
-      newSocket.on('online_users', (users) => {
-        setOnlineUsers(users);
-      });
+    setSocket(newSocket);
 
-      newSocket.on('new_notification', (notification) => {
-        toast(notification.content, {
-          icon: '🔔',
-          style: {
-            borderRadius: '10px',
-            background: '#333',
-            color: '#fff',
-          },
-        });
-      });
-
-      setSocket(newSocket);
-
-      return () => newSocket.disconnect();
-    }
-  }, [user]);
+    return () => {
+      newSocket.disconnect();
+      setSocket(null);
+    };
+  }, [user?.id]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>
