@@ -13,40 +13,33 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (user) {
+      const newSocket = io('http://localhost:5001'); // Use env var in prod
 
-    const newSocket = io('http://localhost:5001', {
-      transports: ['websocket'],   // skip polling, go straight to WS
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000,
-    });
-
-    newSocket.on('connect', () => {
-      newSocket.emit('setup', user.id);
-    });
-
-    newSocket.on('online_users', (users) => {
-      setOnlineUsers(users);
-    });
-
-    newSocket.on('new_notification', (notification) => {
-      toast(notification.content, {
-        icon: '🔔',
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
+      newSocket.on('connect', () => {
+        newSocket.emit('setup', user.id);
       });
-    });
 
-    setSocket(newSocket);
+      newSocket.on('online_users', (users) => {
+        setOnlineUsers(users);
+      });
 
-    return () => {
-      newSocket.disconnect();
-      setSocket(null);
-    };
-  }, [user?.id]);  // depend on the ID string, not the object — prevents reconnect storm
+      newSocket.on('new_notification', (notification) => {
+        toast(notification.content, {
+          icon: '🔔',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
+      });
+
+      setSocket(newSocket);
+
+      return () => newSocket.disconnect();
+    }
+  }, [user]);
 
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>

@@ -13,23 +13,23 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin image serving
 app.use(compression());
 
 // Serve static uploads
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-if (NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('ProjectDock API is running...');
+  res.send('TaskFlow AI API is running...');
 });
 
+// Setup API routes here
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/projects', require('./src/routes/projectRoutes'));
@@ -52,22 +52,13 @@ app.use(errorHandler);
 const http = require('http');
 const { initializeSocket } = require('./src/utils/socket');
 
-const PORT = process.env.PORT || 5001;
+const PORT = 5001; // Hardcoded to bypass macOS port 5000 conflict
 const server = http.createServer(app);
 
+// Initialize Socket.io
 initializeSocket(server);
 
 server.listen(PORT, () => {
-  console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
-
-// Graceful shutdown — releases the port so nodemon can restart cleanly
-const shutdown = () => {
-  server.close(() => {
-    console.log('Server closed gracefully.');
-    process.exit(0);
-  });
-};
-
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+// trigger nodemon restart
