@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+
 import { Plus, Edit3, Trash2, X, FileText, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -144,12 +143,12 @@ const ProjectWiki = ({ project }) => {
 
             <div className="flex-1 overflow-y-auto">
               {isEditing ? (
-                <div className="h-full editor-container dark-editor">
-                  <ReactQuill 
-                    theme="snow" 
+                <div className="h-full p-4">
+                  <textarea 
+                    rows={16}
                     value={editForm.content} 
-                    onChange={(val) => setEditForm({...editForm, content: val})}
-                    className="h-full border-none"
+                    onChange={(e) => setEditForm({...editForm, content: e.target.value})}
+                    className="w-full h-full p-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/40 outline-none text-gray-900 dark:text-white font-medium resize-none font-mono text-sm"
                     placeholder="Write your documentation here..."
                   />
                 </div>

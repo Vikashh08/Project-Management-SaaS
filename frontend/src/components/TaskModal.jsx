@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+
 import { useSocket } from '../context/SocketContext';
 import { X, MessageSquare, CheckSquare, Clock, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -214,14 +213,13 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
                     </div>
                     {isEditingDesc ? (
                       <div className="space-y-3">
-                        <div className="bg-white dark:bg-gray-900 rounded-lg text-black dark:text-white">
-                          <ReactQuill 
-                            theme="snow" 
-                            value={descContent} 
-                            onChange={setDescContent}
-                            className="h-48 mb-12"
-                          />
-                        </div>
+                        <textarea 
+                          rows={6}
+                          value={descContent} 
+                          onChange={(e) => setDescContent(e.target.value)}
+                          className="w-full p-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-primary/40 outline-none text-gray-900 dark:text-white font-medium resize-none"
+                          placeholder="Add task description..."
+                        />
                         <div className="flex space-x-2">
                           <button 
                             onClick={() => updateTaskMutation.mutate({ description: descContent })}
