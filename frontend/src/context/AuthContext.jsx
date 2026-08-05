@@ -72,6 +72,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserState = (updatedFields) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem('userInfo', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('userInfo');
@@ -79,10 +87,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, guestLogin, googleLogin, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, guestLogin, googleLogin, updateUserState, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 };
-
-

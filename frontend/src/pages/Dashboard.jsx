@@ -133,15 +133,25 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 h-full overflow-y-auto">
-      <div className="flex justify-between items-end mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-color">Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
-          <p className="text-text-muted text-sm mt-1">Here's what's happening with your projects today.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-primary/20 dark:ring-primary/40 shadow-lg flex-shrink-0">
+            <img 
+              src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`}
+              alt={user?.name || 'User Profile'} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-text-color">Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
+            <p className="text-text-muted text-sm mt-0.5">Here's what's happening with your projects today.</p>
+          </div>
         </div>
         <button className="hidden sm:block px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-text-color rounded-xl text-sm font-medium shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           Download Report
         </button>
       </div>
+
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

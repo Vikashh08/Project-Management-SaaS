@@ -49,9 +49,37 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
       }
     }
 
-    res.status(201).json({
-      message: 'File uploaded successfully',
-      attachment,
+// @desc    Upload avatar picture
+// @route   POST /api/upload/avatar
+// @access  Private
+router.post('/avatar', protect, upload.single('avatar'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      res.status(400);
+      throw new Error('Please upload an image file');
+    }
+
+    let avatarUrl = req.file.path;
+    if (!avatarUrl.startsWith('http')) {
+      avatarUrl = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { avatarUrl },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUrl: true,
+        role: true,
+      }
+    });
+
+    res.json({
+      message: 'Avatar uploaded successfully',
+      avatarUrl: updatedUser.avatarUrl,
+      user: updatedUser,
     });
   } catch (error) {
     next(error);
@@ -59,3 +87,4 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
 });
 
 module.exports = router;
+

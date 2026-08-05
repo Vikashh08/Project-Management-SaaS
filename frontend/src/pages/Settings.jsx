@@ -3,15 +3,59 @@ import { useAuth } from '../context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { CheckCircle2, ListTodo, Activity, User, Shield, Link, Globe, Key } from 'lucide-react';
+import { CheckCircle2, ListTodo, Activity, User, Shield, Link, Globe, Key, Upload, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, updateUserState } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('profile'); // profile | security | activity
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const handleAvatarUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file (PNG, JPG, WEBP)');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    setIsUploadingAvatar(true);
+    try {
+      const { data } = await api.post('/upload/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      updateUserState({ avatarUrl: data.avatarUrl });
+      toast.success('Profile picture updated successfully!');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to upload profile picture');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleAvatarUpload(e.dataTransfer.files[0]);
+    }
+  };
+
   // Form State for Profile
+
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     bio: user?.bio || '',
@@ -176,15 +220,60 @@ const Settings = () => {
                 <h3 className="text-lg font-bold text-text-color mb-6">Profile Information</h3>
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
                   
-                  <div className="flex items-center gap-6 pb-6 border-b border-border-color">
-                    <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold overflow-hidden border-4 border-surface-color shadow-sm">
-                      <img src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} alt="Profile" className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="text-text-color font-medium mb-1">Avatar Image</h4>
-                      <p className="text-sm text-text-muted mb-3">Your avatar is currently tied to your email.</p>
+                  {/* Drag & Drop Avatar Upload Section */}
+                  <div className="pb-6 border-b border-border-color">
+                    <h4 className="text-sm font-semibold text-text-color mb-3">Profile Picture</h4>
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      <div className="relative group w-24 h-24 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-primary/20 dark:ring-primary/40 shadow-md">
+                        <img 
+                          src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} 
+                          alt={user?.name || 'Profile'} 
+                          className="w-full h-full object-cover" 
+                        />
+                        <label 
+                          htmlFor="avatar-input"
+                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white cursor-pointer transition-opacity"
+                        >
+                          <Camera className="w-6 h-6" />
+                        </label>
+                      </div>
+
+                      <div 
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`flex-1 w-full p-4 border-2 border-dashed rounded-2xl transition-all text-center flex flex-col items-center justify-center gap-2 ${
+                          isDragging 
+                            ? 'border-primary bg-primary/10 scale-[1.01]' 
+                            : 'border-slate-300 dark:border-white/15 hover:border-primary/50 bg-gray-50 dark:bg-gray-800/40'
+                        }`}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-text-color">
+                            <label htmlFor="avatar-input" className="text-primary hover:underline cursor-pointer">Click to upload</label> or drag and drop
+                          </p>
+                          <p className="text-[11px] text-text-muted mt-0.5">PNG, JPG, WEBP or GIF (max 5MB)</p>
+                        </div>
+                        <input 
+                          id="avatar-input"
+                          type="file" 
+                          accept="image/*"
+                          onChange={(e) => e.target.files && handleAvatarUpload(e.target.files[0])}
+                          className="hidden"
+                        />
+                        {isUploadingAvatar && (
+                          <div className="flex items-center gap-2 text-xs text-primary font-medium mt-1">
+                            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            <span>Uploading photo...</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
+
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
