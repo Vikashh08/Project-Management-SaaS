@@ -1,4 +1,6 @@
 require('dotenv').config();
+const http = require('http');
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,30 +8,39 @@ const morgan = require('morgan');
 const compression = require('compression');
 
 const { notFound, errorHandler } = require('./src/middleware/errorMiddleware');
+const { initializeSocket } = require('./src/utils/socket');
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin image serving
 app.use(compression());
 
 // Serve static uploads
-const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-if (process.env.NODE_ENV === 'development') {
+const NODE_ENV = process.env.NODE_ENV || 'development';
+if (NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('TaskFlow AI API is running...');
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', environment: NODE_ENV });
 });
 
-// Setup API routes here
+// Root endpoint
+app.get('/', (req, res) => {
+  res.send('ProjectDock SaaS API is running...');
+});
+
+// API routes
 app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/projects', require('./src/routes/projectRoutes'));
@@ -49,16 +60,38 @@ app.use('/api/discussions', require('./src/routes/discussionRoutes'));
 app.use(notFound);
 app.use(errorHandler);
 
-const http = require('http');
-const { initializeSocket } = require('./src/utils/socket');
-
-const PORT = 5001; // Hardcoded to bypass macOS port 5000 conflict
+const PORT = process.env.PORT || 5001;
 const server = http.createServer(app);
 
 // Initialize Socket.io
 initializeSocket(server);
 
-server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use.`);
+    process.exit(1);
+  } else {
+    throw err;
+  }
 });
-// trigger nodemon restart
+
+server.listen(PORT, () => {
+  console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
+});
+
+// Graceful shutdown handlers for Render / Docker / Nodemon
+process.once('SIGUSR2', () => {
+  server.close(() => {
+    process.kill(process.pid, 'SIGUSR2');
+  });
+});
+
+const shutdown = () => {
+  server.close(() => {
+    console.log('Server closed gracefully.');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
