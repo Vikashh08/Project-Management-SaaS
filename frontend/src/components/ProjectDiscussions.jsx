@@ -21,27 +21,68 @@ const ProjectDiscussions = ({ project }) => {
 
   const createMutation = useMutation({
     mutationFn: (data) => api.post(`/discussions/project/${project.id}`, data),
+    onMutate: async (newPost) => {
+      await queryClient.cancelQueries(['discussions', project.id]);
+      const previous = queryClient.getQueryData(['discussions', project.id]);
+      // Optimistically add the new discussion to the top of the list
+      queryClient.setQueryData(['discussions', project.id], (old = []) => [
+        { id: `temp-${Date.now()}`, ...newPost, replies: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), author: { name: 'You', avatarUrl: null } },
+        ...old
+      ]);
+      return { previous };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['discussions', project.id]);
       setNewPost({ title: '', content: '' });
       toast.success('Discussion posted');
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['discussions', project.id], context.previous);
+      toast.error('Failed to post discussion');
     }
   });
 
   const replyMutation = useMutation({
     mutationFn: ({ id, content }) => api.post(`/discussions/${id}/replies`, { content }),
+    onMutate: async ({ id, content }) => {
+      await queryClient.cancelQueries(['discussions', project.id]);
+      const previous = queryClient.getQueryData(['discussions', project.id]);
+      // Optimistically append the reply inside the correct discussion
+      queryClient.setQueryData(['discussions', project.id], (old = []) =>
+        old.map(disc =>
+          disc.id === id
+            ? { ...disc, replies: [...(disc.replies || []), { id: `temp-${Date.now()}`, content, createdAt: new Date().toISOString(), author: { name: 'You', avatarUrl: null } }] }
+            : disc
+        )
+      );
+      return { previous };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['discussions', project.id]);
       setReplyContent({});
       toast.success('Reply added');
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['discussions', project.id], context.previous);
+      toast.error('Failed to add reply');
     }
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/discussions/${id}`),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries(['discussions', project.id]);
+      const previous = queryClient.getQueryData(['discussions', project.id]);
+      // Optimistically remove the discussion from the list
+      queryClient.setQueryData(['discussions', project.id], (old = []) => old.filter(d => d.id !== id));
+      return { previous };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries(['discussions', project.id]);
       toast.success('Discussion deleted');
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['discussions', project.id], context.previous);
+      toast.error('Failed to delete discussion');
     }
   });
 

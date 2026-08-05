@@ -34,15 +34,39 @@ const CreateTaskModal = ({ isOpen, onClose, defaultProjectId }) => {
   }, [isOpen, defaultProjectId]);
 
   const createMutation = useMutation({
-    mutationFn: async (data) => api.post('/tasks', data),
-    onSuccess: () => {
+    mutationFn: async (data) => {
+      const { data: res } = await api.post('/tasks', data);
+      return res;
+    },
+    onMutate: async (newTask) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries(['tasks']);
+      const previousTasks = queryClient.getQueryData(['tasks']);
+      // Optimistically add the new task to the list immediately
+      queryClient.setQueryData(['tasks'], (old = []) => [
+        { id: `temp-${Date.now()}`, ...newTask, status: 'TODO', assignees: [], createdAt: new Date().toISOString() },
+        ...(Array.isArray(old) ? old : [])
+      ]);
+      return { previousTasks };
+    },
+    onSuccess: (savedTask) => {
+      // Replace the optimistic temp entry with the real saved task
+      queryClient.setQueryData(['tasks'], (old = []) =>
+        Array.isArray(old)
+          ? old.map(t => (t.id?.startsWith('temp-') ? savedTask : t))
+          : old
+      );
       queryClient.invalidateQueries(['tasks']);
-      queryClient.invalidateQueries(['project', defaultProjectId]);
+      if (defaultProjectId) queryClient.invalidateQueries(['project', defaultProjectId]);
       toast.success('Task created successfully');
       setTaskData({ title: '', description: '', priority: 'MEDIUM', startDate: '', dueDate: '', projectId: defaultProjectId || '' });
       onClose();
     },
-    onError: (err) => {
+    onError: (err, _vars, context) => {
+      // Roll back to the state before optimistic update
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks'], context.previousTasks);
+      }
       toast.error(err.response?.data?.message || 'Failed to create task');
     }
   });
