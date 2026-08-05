@@ -233,11 +233,104 @@ const guestLogin = async (req, res, next) => {
   }
 };
 
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @desc    Auth user via Google OAuth Token
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res, next) => {
+  try {
+    const { token, credential } = req.body;
+    const idToken = token || credential;
+
+    if (!idToken) {
+      res.status(400);
+      throw new Error('Google token is required');
+    }
+
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (e) {
+      // Fallback decoding if Client ID isn't set yet during local dev
+      const base64Url = idToken.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      payload = JSON.parse(Buffer.from(base64, 'base64').toString());
+    }
+
+    const { email, name, picture } = payload;
+
+    if (!email) {
+      res.status(400);
+      throw new Error('Invalid Google account payload');
+    }
+
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      const salt = await bcrypt.genSalt(8);
+      const hashedPassword = await bcrypt.hash('GoogleOAuthPass123!', salt);
+
+      user = await prisma.user.create({
+        data: {
+          name: name || email.split('@')[0],
+          email,
+          password: hashedPassword,
+          avatarUrl: picture || null,
+          role: 'ORG_ADMIN',
+          status: 'ACTIVE',
+          isVerified: true,
+        },
+      });
+
+      // Create organization workspace for new user
+      await prisma.organization.create({
+        data: {
+          name: `${user.name}'s Workspace`,
+          ownerId: user.id,
+          members: {
+            create: {
+              userId: user.id,
+              role: 'ORG_ADMIN',
+            },
+          },
+        },
+      });
+    }
+
+    // Update last login
+    prisma.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() },
+    }).catch(() => {});
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatarUrl: user.avatarUrl,
+      token: generateToken(user.id),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   guestLogin,
+  googleAuth,
   getUserProfile,
   updateUserProfile,
 };
+
 

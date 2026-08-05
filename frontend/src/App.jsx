@@ -21,9 +21,6 @@ import Landing from './pages/Landing';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SocketProvider } from './context/SocketContext';
-import { ClerkProvider } from '@clerk/clerk-react';
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_ZWxlY3RyaWMtc25pcGUtOS5jbGVyay5hY2NvdW50cy5kZXYk';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,17 +44,16 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <AuthProvider>
-          <SocketProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <BrowserRouter>
+            <Toaster position="top-right" />
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/invite/:token" element={<AcceptInvite />} />
 
-            <BrowserRouter>
-              <Toaster position="top-right" />
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/invite/:token" element={<AcceptInvite />} />
 
                 <Route element={<ProtectedRoute />}>
                   <Route path="/dashboard" element={<DashboardLayout />}>
@@ -74,14 +70,14 @@ function App() {
                     <Route path="settings" element={<Settings />} />
                   </Route>
                 </Route>
-              </Routes>
-            </BrowserRouter>
-          </SocketProvider>
-        </AuthProvider>
-      </ClerkProvider>
+            </Routes>
+          </BrowserRouter>
+        </SocketProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
 
