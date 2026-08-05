@@ -28,10 +28,11 @@ const formatElapsed = (startTime) => {
 
 // ── Active Timer Banner ──────────────────────────────────────────────────
 const ActiveTimerBanner = ({ timer, onStop }) => {
-  const [elapsed, setElapsed] = React.useState('00:00:00');
+  const [elapsed, setElapsed] = React.useState(() => timer ? formatElapsed(timer.startTime) : '00:00:00');
 
   React.useEffect(() => {
     if (!timer) return;
+    setElapsed(formatElapsed(timer.startTime));
     const interval = setInterval(() => {
       setElapsed(formatElapsed(timer.startTime));
     }, 1000);
@@ -206,20 +207,53 @@ const Timesheet = () => {
 
   const stopMutation = useMutation({
     mutationFn: () => api.put('/timelogs/stop'),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['activeTimer'] });
+      const previousTimer = queryClient.getQueryData(['activeTimer']);
+      queryClient.setQueryData(['activeTimer'], null);
+      return { previousTimer };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousTimer) {
+        queryClient.setQueryData(['activeTimer'], context.previousTimer);
+      }
+      toast.error(err.response?.data?.message || 'Failed to stop');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['activeTimer'] });
+      queryClient.invalidateQueries({ queryKey: ['myTimeLogs'] });
+    },
     onSuccess: () => {
       toast.success('Timer stopped!');
-      queryClient.invalidateQueries(['activeTimer', 'myTimeLogs']);
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Failed to stop')
+    }
   });
 
   const startMutation = useMutation({
     mutationFn: (taskId) => api.post(`/timelogs/task/${taskId}/start`),
+    onMutate: async (taskId) => {
+      await queryClient.cancelQueries({ queryKey: ['activeTimer'] });
+      const previousTimer = queryClient.getQueryData(['activeTimer']);
+      const task = tasks.find(t => t.id === taskId);
+      queryClient.setQueryData(['activeTimer'], {
+        id: 'optimistic-timer',
+        startTime: new Date().toISOString(),
+        taskId,
+        task: task || { title: 'Starting...' }
+      });
+      return { previousTimer };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousTimer !== undefined) {
+        queryClient.setQueryData(['activeTimer'], context.previousTimer);
+      }
+      toast.error(err.response?.data?.message || 'Failed to start');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['activeTimer'] });
+    },
     onSuccess: () => {
       toast.success('Timer started!');
-      queryClient.invalidateQueries(['activeTimer']);
-    },
-    onError: (err) => toast.error(err.response?.data?.message || 'Failed to start')
+    }
   });
 
   const deleteMutation = useMutation({

@@ -49,6 +49,12 @@ router.post('/', protect, upload.single('file'), async (req, res, next) => {
       }
     }
 
+    res.status(201).json(attachment);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // @desc    Upload avatar picture
 // @route   POST /api/upload/avatar
 // @access  Private

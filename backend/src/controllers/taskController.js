@@ -8,7 +8,7 @@ const { createNotification } = require('./notificationController');
 // @access  Private
 const createTask = async (req, res, next) => {
   try {
-    const { title, description, priority, status, dueDate, projectId, estimatedHours } = req.body;
+    const { title, description, priority, status, startDate, dueDate, projectId, estimatedHours, columnId, swimlaneId } = req.body;
 
     if (!title) {
       res.status(400);
@@ -49,10 +49,13 @@ const createTask = async (req, res, next) => {
         description,
         priority: priority || 'MEDIUM',
         status: status || 'TODO',
+        startDate: startDate ? new Date(startDate) : null,
         dueDate: dueDate ? new Date(dueDate) : null,
         estimatedHours,
         reporterId: req.user.id,
         projectId: finalProjectId,
+        columnId: columnId || null,
+        swimlaneId: swimlaneId || null,
       },
     });
 
@@ -147,7 +150,7 @@ const getTaskById = async (req, res, next) => {
 // @access  Private
 const updateTask = async (req, res, next) => {
   try {
-    const { title, description, priority, status, dueDate, estimatedHours, actualHours } = req.body;
+    const { title, description, priority, status, startDate, dueDate, estimatedHours, actualHours, columnId, swimlaneId } = req.body;
 
     let task = await prisma.task.findUnique({
       where: { id: req.params.id }
@@ -165,9 +168,12 @@ const updateTask = async (req, res, next) => {
         description, 
         priority, 
         status, 
+        startDate: startDate ? new Date(startDate) : undefined,
         dueDate: dueDate ? new Date(dueDate) : undefined, 
         estimatedHours, 
-        actualHours 
+        actualHours,
+        columnId: columnId !== undefined ? columnId : undefined,
+        swimlaneId: swimlaneId !== undefined ? swimlaneId : undefined
       },
       include: {
         assignees: { include: { user: { select: { id: true, name: true, avatarUrl: true } } } },

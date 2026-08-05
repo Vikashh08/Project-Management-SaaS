@@ -71,6 +71,15 @@ const stopTimer = async (req, res, next) => {
       }
     });
 
+    if (running.taskId) {
+      await prisma.task.update({
+        where: { id: running.taskId },
+        data: {
+          actualHours: { increment: durationMinutes / 60 }
+        }
+      });
+    }
+
     res.json(timeLog);
   } catch (error) {
     next(error);
@@ -146,6 +155,15 @@ const logTimeManually = async (req, res, next) => {
         task: { select: { id: true, title: true } }
       }
     });
+
+    if (taskId) {
+      await prisma.task.update({
+        where: { id: taskId },
+        data: {
+          actualHours: { increment: durationMinutes / 60 }
+        }
+      });
+    }
 
     res.status(201).json(timeLog);
   } catch (error) {

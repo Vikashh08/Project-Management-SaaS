@@ -24,12 +24,14 @@ const getTeamSprints = async (req, res, next) => {
 const createSprint = async (req, res, next) => {
   try {
     const { teamId } = req.params;
-    const { name, startDate, endDate, status } = req.body;
+    const { name, startDate, endDate, status, goal, capacity } = req.body;
 
     const sprint = await prisma.sprint.create({
       data: {
         teamId,
         name,
+        goal: goal || null,
+        capacity: capacity ? parseFloat(capacity) : null,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         status: status || 'PLANNED'
@@ -45,12 +47,14 @@ const createSprint = async (req, res, next) => {
 const updateSprint = async (req, res, next) => {
   try {
     const { sprintId } = req.params;
-    const { name, startDate, endDate, status } = req.body;
+    const { name, startDate, endDate, status, goal, capacity } = req.body;
 
     const sprint = await prisma.sprint.update({
       where: { id: sprintId },
       data: {
         name,
+        goal,
+        capacity: capacity ? parseFloat(capacity) : null,
         startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
         status

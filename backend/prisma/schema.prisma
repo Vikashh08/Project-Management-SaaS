@@ -106,6 +106,10 @@ model User {
   sentInvitations Invitation[]
   teamMessages    TeamMessage[]
 
+  wikiPages       WikiPage[]         @relation("WikiAuthor")
+  discussions     Discussion[]       @relation("DiscussionAuthor")
+  discussionReplies DiscussionReply[]  @relation("DiscussionReplyAuthor")
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -187,13 +191,16 @@ model TeamMember {
 model Project {
   id              String   @id @default(uuid())
   name            String
+  projectKey      String?
   description     String?
   logo            String?
+  banner          String?
   color           String?
   status          ProjectStatus @default(ACTIVE)
   startDate       DateTime?
   deadline        DateTime?
   priority        TaskPriority  @default(MEDIUM)
+  estimatedBudget Float?
   tags            String[]
   visibility      Visibility    @default(PRIVATE)
   
@@ -208,7 +215,11 @@ model Project {
   members         ProjectMember[]
   tasks           Task[]
   labels          Label[]
+  wikiPages       WikiPage[]
+  discussions     Discussion[]
   attachments     Attachment[]
+  boardColumns    BoardColumn[]
+  swimlanes       Swimlane[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -238,6 +249,7 @@ model Task {
   description     String?
   priority        TaskPriority @default(MEDIUM)
   status          TaskStatus   @default(TODO)
+  startDate       DateTime?
   dueDate         DateTime?
   estimatedHours  Float?
   actualHours     Float?
@@ -246,10 +258,14 @@ model Task {
   projectId       String
   reporterId      String
   sprintId        String?
+  columnId        String?
+  swimlaneId      String?
   
   project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   reporter        User     @relation("TaskReporter", fields: [reporterId], references: [id])
   sprint          Sprint?  @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  column          BoardColumn? @relation(fields: [columnId], references: [id], onDelete: SetNull)
+  swimlane        Swimlane?    @relation(fields: [swimlaneId], references: [id], onDelete: SetNull)
   
   assignees       TaskAssignee[]
   subtasks        Subtask[]
@@ -346,22 +362,25 @@ model Comment {
 }
 
 model Attachment {
-  id              String   @id @default(uuid())
-  url             String
-  filename        String
-  size            Int
-  type            String
-  uploaderId      String
-  taskId          String?
-  projectId       String?
-  teamId          String?
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  size      Int      // in bytes
+  type      String   // mime type
   
-  uploader        User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
-  task            Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  team            Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  projectId String?
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  createdAt       DateTime @default(now())
+  uploaderId String
+  uploader   User    @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model Notification {
@@ -489,6 +508,8 @@ model TeamMessage {
 model Sprint {
   id              String   @id @default(uuid())
   name            String
+  goal            String?
+  capacity        Float?
   startDate       DateTime
   endDate         DateTime
   status          String   @default("PLANNED") // PLANNED, ACTIVE, COMPLETED
@@ -501,4 +522,80 @@ model Sprint {
   updatedAt       DateTime @updatedAt
 
   @@index([teamId])
+}
+
+model BoardColumn {
+  id        String   @id @default(uuid())
+  name      String
+  position  Int      @default(0)
+  projectId String
+  
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model Swimlane {
+  id        String   @id @default(uuid())
+  name      String
+  position  Int      @default(0)
+  projectId String
+  
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model WikiPage {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  authorId    String
+  author      User     @relation("WikiAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Discussion {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  authorId    String
+  author      User     @relation("DiscussionAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  replies     DiscussionReply[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model DiscussionReply {
+  id            String     @id @default(uuid())
+  content       String     @db.Text
+  
+  discussionId  String
+  discussion    Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+  authorId      String
+  author        User       @relation("DiscussionReplyAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }

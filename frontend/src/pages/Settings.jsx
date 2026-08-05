@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { CheckCircle2, ListTodo, Activity, User, Shield, Link, Globe, Key, Upload, Camera } from 'lucide-react';
+import { CheckCircle2, ListTodo, Activity, User, Shield, Link, Globe, Key, Upload, Camera, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Settings = () => {
@@ -11,7 +11,6 @@ const Settings = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('profile'); // profile | security | activity
 
-  const [isDragging, setIsDragging] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const handleAvatarUpload = async (file) => {
@@ -36,25 +35,6 @@ const Settings = () => {
       setIsUploadingAvatar(false);
     }
   };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleAvatarUpload(e.dataTransfer.files[0]);
-    }
-  };
-
-  // Form State for Profile
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -142,13 +122,14 @@ const Settings = () => {
     });
   };
 
-  const MetricCard = ({ title, value, icon: Icon, colorClass }) => (
-    <div className="saas-card p-6 flex items-center justify-between">
-      <div>
-        <p className="text-text-muted text-sm font-medium mb-1">{title}</p>
-        <h4 className="text-2xl font-bold text-text-color">{value || 0}</h4>
+  const MetricCard = ({ title, value, icon: Icon, colorClass, gradientClass }) => (
+    <div className="saas-card p-6 flex items-center justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group overflow-hidden relative border-t-4 border-t-transparent hover:border-t-primary">
+      <div className="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+      <div className="relative z-10">
+        <p className="text-text-muted text-sm font-semibold mb-1">{title}</p>
+        <h4 className="text-3xl font-extrabold text-text-color tracking-tight">{value || 0}</h4>
       </div>
-      <div className={`p-3 rounded-xl ${colorClass}`}>
+      <div className={`relative z-10 p-3.5 rounded-2xl shadow-inner ${colorClass} bg-gradient-to-br ${gradientClass}`}>
         <Icon className="w-6 h-6" />
       </div>
     </div>
@@ -162,20 +143,20 @@ const Settings = () => {
       </div>
 
       {/* Metrics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <MetricCard title="Tasks Completed" value={metrics?.totalCompleted} icon={CheckCircle2} colorClass="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" />
-         <MetricCard title="Active Tasks" value={metrics?.activeTasks} icon={ListTodo} colorClass="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" />
-         <MetricCard title="Productivity Score" value={metrics?.productivityScore} icon={Activity} colorClass="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+         <MetricCard title="Tasks Completed" value={metrics?.totalCompleted} icon={CheckCircle2} colorClass="text-emerald-700 dark:text-emerald-100" gradientClass="from-emerald-100 to-emerald-200 dark:from-emerald-600 dark:to-emerald-800" />
+         <MetricCard title="Active Tasks" value={metrics?.activeTasks} icon={ListTodo} colorClass="text-blue-700 dark:text-blue-100" gradientClass="from-blue-100 to-blue-200 dark:from-blue-600 dark:to-blue-800" />
+         <MetricCard title="Productivity Score" value={metrics?.productivityScore} icon={Activity} colorClass="text-purple-700 dark:text-purple-100" gradientClass="from-purple-100 to-purple-200 dark:from-purple-600 dark:to-purple-800" />
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-4 border-b border-border-color mb-6">
+      <div className="flex p-1 space-x-1 bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-md rounded-xl w-full sm:w-max mb-8 border border-gray-200 dark:border-gray-700 shadow-inner overflow-x-auto">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+          className={`flex-1 sm:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 ${
             activeTab === 'profile'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-text-muted hover:text-text-color hover:border-gray-300'
+              ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-600'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
           }`}
         >
           <User className="w-4 h-4" />
@@ -183,10 +164,10 @@ const Settings = () => {
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+          className={`flex-1 sm:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 ${
             activeTab === 'security'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-text-muted hover:text-text-color hover:border-gray-300'
+              ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-600'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
           }`}
         >
           <Shield className="w-4 h-4" />
@@ -194,10 +175,10 @@ const Settings = () => {
         </button>
         <button
           onClick={() => setActiveTab('activity')}
-          className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+          className={`flex-1 sm:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 ${
             activeTab === 'activity'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-text-muted hover:text-text-color hover:border-gray-300'
+              ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200/50 dark:border-gray-600'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -220,43 +201,41 @@ const Settings = () => {
                 <h3 className="text-lg font-bold text-text-color mb-6">Profile Information</h3>
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
                   
-                  {/* Drag & Drop Avatar Upload Section */}
-                  <div className="pb-6 border-b border-border-color">
-                    <h4 className="text-sm font-semibold text-text-color mb-3">Profile Picture</h4>
-                    <div className="flex flex-col sm:flex-row items-center gap-6">
-                      <div className="relative group w-24 h-24 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-primary/20 dark:ring-primary/40 shadow-md">
-                        <img 
-                          src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} 
-                          alt={user?.name || 'Profile'} 
-                          className="w-full h-full object-cover" 
-                        />
+                  {/* Avatar Upload Section */}
+                  <div className="pb-8 mb-8 border-b border-border-color">
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
+                      <div className="relative inline-block group shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur opacity-40 group-hover:opacity-70 transition-opacity duration-300"></div>
+                        <div className="relative w-28 h-28 rounded-full overflow-hidden ring-4 ring-white dark:ring-gray-800 shadow-xl">
+                          <img 
+                            src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} 
+                            alt={user?.name || 'Profile'} 
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
                         <label 
                           htmlFor="avatar-input"
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white cursor-pointer transition-opacity"
+                          className="absolute bottom-1 right-1 p-2 bg-blue-600 text-white rounded-full shadow-lg cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 border-2 border-white dark:border-gray-800 z-10"
                         >
-                          <Camera className="w-6 h-6" />
+                          <Pencil className="w-4 h-4" />
                         </label>
                       </div>
 
-                      <div 
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                        className={`flex-1 w-full p-4 border-2 border-dashed rounded-2xl transition-all text-center flex flex-col items-center justify-center gap-2 ${
-                          isDragging 
-                            ? 'border-primary bg-primary/10 scale-[1.01]' 
-                            : 'border-slate-300 dark:border-white/15 hover:border-primary/50 bg-gray-50 dark:bg-gray-800/40'
-                        }`}
-                      >
-                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                          <Upload className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-text-color">
-                            <label htmlFor="avatar-input" className="text-primary hover:underline cursor-pointer">Click to upload</label> or drag and drop
-                          </p>
-                          <p className="text-[11px] text-text-muted mt-0.5">PNG, JPG, WEBP or GIF (max 5MB)</p>
-                        </div>
+                      <div className="flex flex-col text-center sm:text-left">
+                        <h4 className="text-xl font-bold text-text-color">Profile Picture</h4>
+                        <p className="text-sm text-text-muted mt-1 max-w-sm">We recommend an image of at least 256x256px. You can upload a PNG, JPG, WEBP, or GIF (max 5MB).</p>
+                        {isUploadingAvatar ? (
+                          <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-blue-600 font-medium mt-4 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg w-max mx-auto sm:mx-0">
+                            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span>Uploading your photo...</span>
+                          </div>
+                        ) : (
+                          <div className="mt-4 flex items-center justify-center sm:justify-start gap-3">
+                            <label htmlFor="avatar-input" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm text-text-color border border-border-color">
+                              Change Photo
+                            </label>
+                          </div>
+                        )}
                         <input 
                           id="avatar-input"
                           type="file" 
@@ -264,12 +243,6 @@ const Settings = () => {
                           onChange={(e) => e.target.files && handleAvatarUpload(e.target.files[0])}
                           className="hidden"
                         />
-                        {isUploadingAvatar && (
-                          <div className="flex items-center gap-2 text-xs text-primary font-medium mt-1">
-                            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span>Uploading photo...</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>

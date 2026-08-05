@@ -90,17 +90,35 @@ const createTeam = async (req, res, next) => {
   try {
     const { name, description, color, email, leadId } = req.body;
 
-    const userMember = await prisma.organizationMember.findFirst({
+    let userMember = await prisma.organizationMember.findFirst({
       where: { userId: req.user.id }
     });
-    if (!userMember) { res.status(400); throw new Error('You must belong to an organization'); }
+    
+    if (!userMember) {
+      // Auto-create an org for the user if they don't have one (retroactive fix)
+      const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+      const newOrg = await prisma.organization.create({
+        data: {
+          name: `${user.name}'s Workspace`,
+          ownerId: user.id,
+          members: {
+            create: {
+              userId: user.id,
+              role: 'ORG_ADMIN'
+            }
+          }
+        },
+        include: { members: true }
+      });
+      userMember = newOrg.members[0];
+    }
 
     const team = await prisma.team.create({
       data: {
         name,
-        description,
+        description: description || null,
         color: color || '#6366f1',
-        email,
+        email: email || null,
         leadId: leadId || null,
         organizationId: userMember.organizationId,
       }

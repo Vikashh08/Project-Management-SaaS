@@ -173,8 +173,14 @@ const TaskModal = ({ isOpen, onClose, taskId }) => {
               <div className="flex items-center space-x-4 mt-2 text-sm text-text-muted">
                 <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-medium">{task?.status.replace('_', ' ')}</span>
                 <span className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-medium">{task?.priority} Priority</span>
+                {task?.startDate && (
+                  <span className="flex items-center text-blue-600 dark:text-blue-400" title="Start Date">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {new Date(task.startDate).toLocaleDateString()}
+                  </span>
+                )}
                 {task?.dueDate && (
-                  <span className="flex items-center text-orange-600 dark:text-orange-400">
+                  <span className="flex items-center text-orange-600 dark:text-orange-400" title="Due Date">
                     <Clock className="w-4 h-4 mr-1" />
                     {new Date(task.dueDate).toLocaleDateString()}
                   </span>

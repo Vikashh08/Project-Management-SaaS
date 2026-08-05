@@ -1,11 +1,21 @@
 const prisma = require('../utils/db');
 
+// Helper to get user's orgs
+const getUserOrgIds = async (userId) => {
+  const memberships = await prisma.organizationMember.findMany({
+    where: { userId },
+    select: { organizationId: true }
+  });
+  return memberships.map(m => m.organizationId);
+};
+
 // @desc    Get dashboard analytics
 // @route   GET /api/analytics
 // @access  Private
 const getDashboardAnalytics = async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const orgIds = await getUserOrgIds(userId);
 
     // Fetch all analytics data in parallel for maximum performance
     const [
@@ -16,61 +26,25 @@ const getDashboardAnalytics = async (req, res, next) => {
       pendingTasks,
       allTasks
     ] = await Promise.all([
-      prisma.project.count({
-        where: { OR: [{ ownerId: userId }, { members: { some: { userId } } }] }
-      }),
-      prisma.project.count({
-        where: {
-          status: 'ACTIVE',
-          OR: [{ ownerId: userId }, { members: { some: { userId } } }]
-        }
-      }),
-      prisma.task.count({
-        where: { assignees: { some: { userId } } }
-      }),
-      prisma.task.count({
-        where: { status: 'DONE', assignees: { some: { userId } } }
-      }),
-      prisma.task.count({
-        where: { status: { not: 'DONE' }, assignees: { some: { userId } } }
-      }),
+      prisma.project.count({ where: { organizationId: { in: orgIds } } }),
+      prisma.project.count({ where: { status: 'ACTIVE', organizationId: { in: orgIds } } }),
+      prisma.task.count({ where: { project: { organizationId: { in: orgIds } } } }),
+      prisma.task.count({ where: { status: 'DONE', project: { organizationId: { in: orgIds } } } }),
+      prisma.task.count({ where: { status: { not: 'DONE' }, project: { organizationId: { in: orgIds } } } }),
       prisma.task.findMany({
-        where: {
-          project: {
-            OR: [{ ownerId: userId }, { members: { some: { userId } } }]
-          }
-        },
+        where: { project: { organizationId: { in: orgIds } } },
         select: { status: true }
       })
     ]);
 
-    const statusDistribution = {
-      TODO: 0,
-      IN_PROGRESS: 0,
-      IN_REVIEW: 0,
-      DONE: 0
-    };
-
+    const statusDistribution = { TODO: 0, IN_PROGRESS: 0, REVIEW: 0, TESTING: 0, BLOCKED: 0, DONE: 0 };
     allTasks.forEach(task => {
-      if (statusDistribution[task.status] !== undefined) {
-        statusDistribution[task.status]++;
-      }
+      if (statusDistribution[task.status] !== undefined) statusDistribution[task.status]++;
     });
 
-    // --- NEW: Team Workload ---
-    // Get all users in the projects and count their assigned tasks
+    // Team Workload
     const allTaskAssignees = await prisma.taskAssignee.findMany({
-      where: {
-        task: {
-          status: { not: 'DONE' },
-          project: {
-            OR: [
-              { ownerId: userId },
-              { members: { some: { userId } } }
-            ]
-          }
-        }
-      },
+      where: { task: { status: { not: 'DONE' }, project: { organizationId: { in: orgIds } } } },
       include: { user: { select: { name: true } } }
     });
 
@@ -80,10 +54,7 @@ const getDashboardAnalytics = async (req, res, next) => {
       workloadMap[name] = (workloadMap[name] || 0) + 1;
     });
 
-    const teamWorkload = Object.keys(workloadMap).map(name => ({
-      name,
-      count: workloadMap[name]
-    })).sort((a, b) => b.count - a.count); // sort descending
+    const teamWorkload = Object.keys(workloadMap).map(name => ({ name, count: workloadMap[name] })).sort((a, b) => b.count - a.count);
 
     res.json({
       totalProjects: projectsCount,
@@ -95,9 +66,7 @@ const getDashboardAnalytics = async (req, res, next) => {
       statusDistribution,
       teamWorkload
     });
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
 
 // @desc    Get burndown chart data for a project
@@ -106,36 +75,19 @@ const getDashboardAnalytics = async (req, res, next) => {
 const getBurndown = async (req, res, next) => {
   try {
     const { projectId } = req.query;
-    if (!projectId) {
-      res.status(400);
-      throw new Error('projectId is required');
-    }
+    if (!projectId) { res.status(400); throw new Error('projectId is required'); }
 
-    // Verify access
+    const orgIds = await getUserOrgIds(req.user.id);
     const project = await prisma.project.findFirst({
-      where: {
-        id: projectId,
-        OR: [
-          { ownerId: req.user.id },
-          { members: { some: { userId: req.user.id } } },
-          { team: { members: { some: { userId: req.user.id } } } }
-        ]
-      },
-      include: {
-        tasks: { select: { id: true, createdAt: true, updatedAt: true, status: true } }
-      }
+      where: { id: projectId, organizationId: { in: orgIds } },
+      include: { tasks: { select: { id: true, createdAt: true, updatedAt: true, status: true } } }
     });
 
-    if (!project) {
-      res.status(404);
-      throw new Error('Project not found or unauthorized');
-    }
+    if (!project) { res.status(404); throw new Error('Project not found or unauthorized'); }
 
-    // Simple Burndown calculation
-    // Dates from project createdAt to now
     const startDate = new Date(project.createdAt);
     const endDate = new Date();
-    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const days = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
     
     const chartData = [];
     const totalTasks = project.tasks.length;
@@ -150,14 +102,12 @@ const getBurndown = async (req, res, next) => {
       chartData.push({
         date: currentDay.toISOString().split('T')[0],
         remaining: createdUpToDay - completedUpToDay,
-        ideal: Math.max(0, totalTasks - (totalTasks / Math.max(1, days)) * i)
+        ideal: Math.max(0, totalTasks - (totalTasks / days) * i)
       });
     }
 
     res.json(chartData);
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
 
 // @desc    Get sprint velocity for a team
@@ -166,18 +116,19 @@ const getBurndown = async (req, res, next) => {
 const getVelocity = async (req, res, next) => {
   try {
     const { teamId } = req.query;
-    if (!teamId) {
-      res.status(400);
-      throw new Error('teamId is required');
-    }
+    if (!teamId) { res.status(400); throw new Error('teamId is required'); }
+
+    const orgIds = await getUserOrgIds(req.user.id);
+    const team = await prisma.team.findFirst({
+      where: { id: teamId, organizationId: { in: orgIds } }
+    });
+    if (!team) { res.status(404); throw new Error('Team not found or unauthorized'); }
 
     const sprints = await prisma.sprint.findMany({
       where: { teamId },
-      include: {
-        tasks: { select: { status: true, estimatedHours: true } }
-      },
+      include: { tasks: { select: { status: true, estimatedHours: true } } },
       orderBy: { startDate: 'asc' },
-      take: 10 // Last 10 sprints
+      take: 10
     });
 
     const velocityData = sprints.map(sprint => {
@@ -192,9 +143,7 @@ const getVelocity = async (req, res, next) => {
     });
 
     res.json(velocityData);
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
 
 // @desc    Get time tracking stats for a project
@@ -203,16 +152,17 @@ const getVelocity = async (req, res, next) => {
 const getTimeTracking = async (req, res, next) => {
   try {
     const { projectId } = req.query;
-    if (!projectId) {
-      res.status(400);
-      throw new Error('projectId is required');
-    }
+    if (!projectId) { res.status(400); throw new Error('projectId is required'); }
+
+    const orgIds = await getUserOrgIds(req.user.id);
+    const project = await prisma.project.findFirst({
+      where: { id: projectId, organizationId: { in: orgIds } }
+    });
+    if (!project) { res.status(404); throw new Error('Project not found or unauthorized'); }
 
     const tasks = await prisma.task.findMany({
       where: { projectId },
-      include: {
-        timeLogs: true
-      }
+      include: { timeLogs: true }
     });
 
     let totalEstimated = 0;
@@ -221,12 +171,8 @@ const getTimeTracking = async (req, res, next) => {
     tasks.forEach(task => {
       totalEstimated += (task.estimatedHours || 0);
       totalActual += (task.actualHours || 0);
-      
-      // Add up detailed time logs if any
       task.timeLogs.forEach(log => {
-        if (log.durationMinutes) {
-          totalActual += (log.durationMinutes / 60);
-        }
+        if (log.durationMinutes) totalActual += (log.durationMinutes / 60);
       });
     });
 
@@ -235,9 +181,7 @@ const getTimeTracking = async (req, res, next) => {
       totalActual: Math.round(totalActual * 10) / 10,
       efficiency: totalActual > 0 ? Math.round((totalEstimated / totalActual) * 100) : 0
     });
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
 
 module.exports = {
