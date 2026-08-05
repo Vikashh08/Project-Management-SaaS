@@ -12,13 +12,18 @@ const Login = () => {
   const location = useLocation();
   const [isGuestLoading, setIsGuestLoading] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     const success = await login(data.email, data.password);
+    setIsSubmitting(false);
     if (success) {
       const returnTo = location.state?.returnTo || '/dashboard';
       navigate(returnTo);
     }
   };
+
 
   const handleGuestAccess = async () => {
     setIsGuestLoading(true);
@@ -116,10 +121,16 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer mt-1"
+            disabled={isSubmitting}
+            className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer mt-1 flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            Sign In with Account
+            {isSubmitting ? (
+              <div className="w-4 h-4 border-2 border-white dark:border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              'Sign In with Account'
+            )}
           </button>
+
         </form>
 
         <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6 font-medium">

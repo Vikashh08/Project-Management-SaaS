@@ -8,14 +8,18 @@ const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     const success = await register(data.name, data.email, data.password);
+    setIsSubmitting(false);
     if (success) {
       const returnTo = location.state?.returnTo || '/dashboard';
       navigate(returnTo);
     }
   };
+
 
   const password = watch('password');
 
@@ -69,10 +73,16 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors mt-2"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors mt-2 flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            Create account
+            {isSubmitting ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              'Create account'
+            )}
           </button>
+
         </form>
 
         <p className="text-center text-sm text-text-muted mt-6">

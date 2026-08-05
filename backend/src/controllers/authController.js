@@ -23,8 +23,9 @@ const registerUser = async (req, res, next) => {
       throw new Error('User already exists');
     }
 
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(8);
     const hashedPassword = await bcrypt.hash(password, salt);
+
 
     const user = await prisma.user.create({
       data: {
@@ -84,13 +85,14 @@ const loginUser = async (req, res, next) => {
         throw new Error('Your account is suspended.');
       }
 
-      // Update lastLogin
-      await prisma.user.update({
+      // Update lastLogin asynchronously without blocking HTTP response
+      prisma.user.update({
         where: { id: user.id },
         data: { lastLogin: new Date() },
-      });
+      }).catch(() => {});
 
       res.json({
+
         id: user.id,
         name: user.name,
         email: user.email,
@@ -183,7 +185,7 @@ const guestLogin = async (req, res, next) => {
     });
 
     if (!user) {
-      const salt = await bcrypt.genSalt(10);
+      const salt = await bcrypt.genSalt(8);
       const hashedPassword = await bcrypt.hash('GuestDemoPass123!', salt);
 
       user = await prisma.user.create({
@@ -211,10 +213,12 @@ const guestLogin = async (req, res, next) => {
       });
     }
 
-    await prisma.user.update({
+    // Update lastLogin asynchronously without blocking response
+    prisma.user.update({
       where: { id: user.id },
       data: { lastLogin: new Date() },
-    });
+    }).catch(() => {});
+
 
     res.json({
       id: user.id,
