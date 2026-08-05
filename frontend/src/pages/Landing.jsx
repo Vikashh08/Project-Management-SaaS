@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { 
   ArrowRight, CheckCircle2, Play, Users, BarChart3, 
-  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap, LayoutDashboard, Search, X, Moon, Sun, Sparkles, UserCheck
+  CheckSquare, Globe, ArrowUpRight, MessageSquare, Shield, Zap, LayoutDashboard, Search, X, Moon, Sun, Sparkles, UserCheck, Anchor
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,7 +23,6 @@ const Landing = () => {
       navigate('/dashboard');
     }
   };
-
 
   const { register: loginRegister, handleSubmit: handleLoginSubmit, formState: { errors: loginErrors }, reset: resetLoginForm } = useForm();
   const { register: registerRegister, handleSubmit: handleRegisterSubmit, formState: { errors: registerErrors }, watch: watchRegister, reset: resetRegisterForm } = useForm();
@@ -45,6 +44,7 @@ const Landing = () => {
       navigate('/dashboard');
     }
   };
+
   const [isDark, setIsDark] = React.useState(
     document.documentElement.classList.contains('dark')
   );
@@ -60,20 +60,23 @@ const Landing = () => {
       setIsDark(true);
     }
   };
+
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] text-[#1a1a2e] dark:text-[#f3f4f6] font-sans selection:bg-primary/20 selection:text-primary transition-colors duration-300">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b0f17] text-[#0f172a] dark:text-[#f8fafc] font-sans selection:bg-primary/20 selection:text-primary transition-colors duration-300">
       {/* Header / Navbar */}
-      <header className="sticky top-0 z-55 bg-white/80 dark:bg-[#09090b]/85 backdrop-blur-md border-b border-gray-100/80 dark:border-white/10 px-6 py-4">
+      <header className="sticky top-0 z-55 bg-white/80 dark:bg-[#0b0f17]/85 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-              <span className="text-white font-bold text-lg leading-none">T</span>
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 text-white">
+              <Anchor className="w-5 h-5" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-text-color dark:text-white">
-              TaskFlow<span className="text-primary">AI</span>
+            <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white font-sans">
+              Project<span className="text-primary">Dock</span>
             </span>
           </div>
+
+
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
@@ -827,10 +830,11 @@ const Landing = () => {
       <footer className="bg-white dark:bg-[#09090b] py-12 px-6 border-t border-gray-100 dark:border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">T</div>
-            <span className="font-bold text-gray-900 dark:text-white font-sans">TaskFlowAI</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">P</div>
+            <span className="font-bold text-gray-900 dark:text-white font-sans">Project Dock</span>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 font-sans">© 2026 TaskFlowAI. All rights reserved.</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 font-sans">© 2026 Project Dock. All rights reserved.</p>
+
         </div>
       </footer>
     </div>

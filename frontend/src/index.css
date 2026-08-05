@@ -5,25 +5,25 @@
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
 
-  /* Vibrant Purple Primary (matching reference design) */
-  --color-primary: #7c3aed;
-  --color-primary-dark: #6d28d9;
-  --color-primary-light: #a78bfa;
-  --color-primary-hover: #6d28d9;
+  /* Modern Electric Indigo & Cyan Primary Theme for ProjectDock */
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #60a5fa;
+  --color-primary-hover: #1d4ed8;
   
   /* Crisp Light Mode */
-  --color-background: #f8f7fa;
+  --color-background: #f8fafc;
   --color-surface: #ffffff;
-  --color-text: #1a1a2e;
-  --color-text-muted: #6b7280;
-  --color-border: #e8e8ed;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
   
   /* Sleek Dark Mode */
-  --color-dark-background: #09090b;
-  --color-dark-surface: #121212;
-  --color-dark-text: #fafafa;
-  --color-dark-text-muted: #a1a1aa;
-  --color-dark-border: #27272a;
+  --color-dark-background: #0b0f17;
+  --color-dark-surface: #131b2e;
+  --color-dark-text: #f8fafc;
+  --color-dark-text-muted: #94a3b8;
+  --color-dark-border: #1e293b;
 
   /* Tailwind CSS Utility Aliases */
   --color-bg-color: var(--bg-color);
@@ -32,6 +32,7 @@
   --color-text-muted: var(--text-muted);
   --color-border-color: var(--border-color);
 }
+
 
 @layer base {
   :root {
@@ -231,14 +232,14 @@
 
 /* Upgrade card gradient */
 .upgrade-card {
-  background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 50%, #e0e7ff 100%);
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #e0f2fe 100%);
   border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
 
 .dark .upgrade-card {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+  background: linear-gradient(135deg, #172554 0%, #1e3a8a 50%, #0f172a 100%);
 }
 
 .upgrade-card::before {
@@ -249,5 +250,5 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.1);
+  background: rgba(37, 99, 235, 0.15);
 }

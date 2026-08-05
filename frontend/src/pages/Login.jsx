@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, ArrowRight, UserCheck, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { Sparkles, ArrowRight, UserCheck, Lock, Mail, ShieldCheck, Anchor } from 'lucide-react';
 
 
 const Login = () => {
@@ -36,17 +36,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafc] dark:bg-[#09090b] px-4 py-8 text-gray-900 dark:text-white transition-colors duration-300">
-      <div className="max-w-md w-full bg-white dark:bg-[#121216] p-8 rounded-3xl shadow-xl border border-gray-100 dark:border-white/10 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-[#0b0f17] px-4 py-8 text-gray-900 dark:text-white transition-colors duration-300">
+      <div className="max-w-md w-full bg-white dark:bg-[#131b2e] p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-white/10 relative overflow-hidden">
         
         {/* Header Badge */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg shadow-primary/25">
-            <span className="text-white font-bold text-2xl leading-none">T</span>
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg shadow-blue-500/25 text-white">
+            <Anchor className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Welcome to TaskFlow<span className="text-primary">AI</span></h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Sign in to access your projects or try Instant Guest Demo</p>
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Welcome to Project<span className="text-primary">Dock</span></h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Sign in to access your workspace or try Instant Guest Demo</p>
         </div>
+
 
         {/* 1-CLICK INSTANT GUEST DEMO ACCESS (PROMINENT TOP CARD) */}
         <div className="mb-6 bg-gradient-to-r from-primary/10 via-indigo-500/10 to-purple-500/10 border border-primary/20 dark:border-primary/30 p-4 rounded-2xl">
@@ -56,8 +57,9 @@ const Login = () => {
             <span className="ml-auto text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">No Password</span>
           </div>
           <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-            Want to test drive TaskFlowAI immediately? Explore full workspace features as a Guest Demo User in 1 click.
+            Want to test drive Project Dock immediately? Explore full workspace features as a Guest Demo User in 1 click.
           </p>
+
           <button
             type="button"
             onClick={handleGuestAccess}
