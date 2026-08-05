@@ -21,6 +21,9 @@ import Landing from './pages/Landing';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SocketProvider } from './context/SocketContext';
+import { ClerkProvider } from '@clerk/clerk-react';
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_ZWxlY3RyaWMtc25pcGUtOS5jbGVyay5hY2NvdW50cy5kZXYk';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,8 +47,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <SocketProvider>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <AuthProvider>
+          <SocketProvider>
+
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
@@ -73,8 +78,10 @@ function App() {
       </BrowserRouter>
         </SocketProvider>
       </AuthProvider>
+      </ClerkProvider>
     </QueryClientProvider>
   );
 }
 
 export default App;
+
