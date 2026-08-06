@@ -7,6 +7,16 @@ const SocketContext = createContext();
 
 export const useSocket = () => useContext(SocketContext);
 
+const getSocketUrl = () => {
+  if (import.meta.env.VITE_SOCKET_URL) {
+    return import.meta.env.VITE_SOCKET_URL.trim().replace(/\/+$/, '').replace(/\/api$/, '');
+  }
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '').replace(/\/api$/, '');
+  }
+  return 'http://localhost:5001';
+};
+
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const { user } = useAuth();
@@ -15,7 +25,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') : 'http://localhost:5001');
+    const socketUrl = getSocketUrl();
     const newSocket = io(socketUrl, {
       transports: ['websocket'],
       reconnectionAttempts: 5,
