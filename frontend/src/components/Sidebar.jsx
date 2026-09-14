@@ -8,13 +8,13 @@ import clsx from 'clsx';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Home', to: '/dashboard', badge: null },
-  { icon: FolderOpen, label: 'Projects', to: '/dashboard/projects', badge: null },
-  { icon: CheckSquare, label: 'Tasks', to: '/dashboard/tasks', badge: null },
-  { icon: Target, label: 'Sprints', to: '/dashboard/sprints', badge: null },
-  { icon: Clock, label: 'Timeline', to: '/dashboard/timeline', badge: null },
-  { icon: Users, label: 'Teams', to: '/dashboard/teams', badge: null },
-  { icon: BarChart3, label: 'Analytics', to: '/dashboard/analytics', badge: null },
+  { icon: LayoutDashboard, label: 'Home', to: '/dashboard', badge: null, id: 'tour-home' },
+  { icon: FolderOpen, label: 'Projects', to: '/dashboard/projects', badge: null, id: 'tour-projects' },
+  { icon: CheckSquare, label: 'Tasks', to: '/dashboard/tasks', badge: null, id: 'tour-tasks' },
+  { icon: Target, label: 'Sprints', to: '/dashboard/sprints', badge: null, id: 'tour-sprints' },
+  { icon: Clock, label: 'Timeline', to: '/dashboard/timeline', badge: null, id: 'tour-timeline' },
+  { icon: Users, label: 'Teams', to: '/dashboard/teams', badge: null, id: 'tour-teams' },
+  { icon: BarChart3, label: 'Analytics', to: '/dashboard/analytics', badge: null, id: 'tour-analytics' },
   { icon: Clock, label: 'Timesheet', to: '/dashboard/timesheet', badge: null },
   { icon: Settings, label: 'Settings', to: '/dashboard/settings', badge: null },
   { icon: Activity, label: 'Activity', to: '/dashboard/activity', badge: null },
@@ -52,10 +52,12 @@ const Sidebar = ({ onClose, onSearchClick }) => {
       <div className="px-4 pb-2 pt-1">
         <div 
           onClick={() => onSearchClick && onSearchClick()}
+          id="tour-search"
           className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-100/80 dark:bg-gray-800/80 rounded-xl cursor-pointer hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-colors group"
         >
           <Search className="w-4 h-4 text-gray-400 group-hover:text-gray-500 transition-colors" />
           <span className="text-sm text-gray-400 group-hover:text-gray-500 transition-colors">Search...</span>
+          <span className="ml-auto text-[10px] font-bold bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded border border-gray-300 dark:border-gray-600">⌘K</span>
         </div>
       </div>
 
@@ -66,7 +68,12 @@ const Sidebar = ({ onClose, onSearchClick }) => {
             <NavLink
               key={item.label}
               to={item.to}
-              onClick={() => onClose && onClose()}
+              id={item.id}
+              onClick={() => {
+                if (window.innerWidth < 768 && onClose) {
+                  onClose();
+                }
+              }}
               className={({ isActive }) =>
                 clsx(
                   'flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group',

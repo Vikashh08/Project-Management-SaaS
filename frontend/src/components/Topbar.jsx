@@ -47,6 +47,7 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
         <button 
           onClick={onMenuClick}
           className="md:hidden p-2 -ml-2 mr-2 text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+          id="tour-mobile-menu"
         >
           <Menu className="w-5 h-5" />
         </button>

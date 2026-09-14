@@ -3,6 +3,7 @@ import { Outlet } from 'react-router';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import CommandPalette from '../components/CommandPalette';
+import GuidedTour from '../components/GuidedTour';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,6 +22,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex h-screen overflow-hidden text-text-color transition-colors duration-300 relative bg-bg-color">
+      <GuidedTour />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
       
       {/* Mobile Sidebar Overlay */}
