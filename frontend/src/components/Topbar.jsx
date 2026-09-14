@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Settings, Download, Home, ChevronRight, Moon, Sun } from 'lucide-react';
+import { Menu, Settings, Download, Home, ChevronRight, Moon, Sun, HelpCircle } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import { useAuth } from '../context/AuthContext';
@@ -86,6 +86,14 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
           title="Toggle Dark Mode"
         >
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+
+        <button 
+          className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-text-muted hover:text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          title="Take Guided Tour"
+          onClick={() => window.dispatchEvent(new Event('start-tour'))}
+        >
+          <HelpCircle className="w-4.5 h-4.5" />
         </button>
 
         <button 
