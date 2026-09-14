@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router';
 import { 
   LayoutDashboard, FolderOpen, CheckSquare, Users, BarChart3, Clock, Settings, 
-  Search, HelpCircle, Activity, LogOut, ChevronRight, X, AlertTriangle, Anchor
+  Search, HelpCircle, Activity, LogOut, ChevronRight, X, AlertTriangle, Anchor, Target
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,8 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Home', to: '/dashboard', badge: null },
   { icon: FolderOpen, label: 'Projects', to: '/dashboard/projects', badge: null },
   { icon: CheckSquare, label: 'Tasks', to: '/dashboard/tasks', badge: null },
+  { icon: Target, label: 'Sprints', to: '/dashboard/sprints', badge: null },
+  { icon: Clock, label: 'Timeline', to: '/dashboard/timeline', badge: null },
   { icon: Users, label: 'Teams', to: '/dashboard/teams', badge: null },
   { icon: BarChart3, label: 'Analytics', to: '/dashboard/analytics', badge: null },
   { icon: Clock, label: 'Timesheet', to: '/dashboard/timesheet', badge: null },

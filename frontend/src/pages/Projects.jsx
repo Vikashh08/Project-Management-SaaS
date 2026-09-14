@@ -230,7 +230,7 @@ const Projects = () => {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Projects Dashboard</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1.5 font-medium">Manage and track your entire portfolio.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
           <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
             <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>
               <LayoutGrid className="w-4 h-4" />

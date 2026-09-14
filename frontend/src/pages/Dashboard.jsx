@@ -91,6 +91,7 @@ const Dashboard = () => {
 
   const donutOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     cutout: '75%',
     plugins: {
       legend: { position: 'bottom', labels: { color: '#9CA3AF', usePointStyle: true, padding: 16 } }
@@ -115,6 +116,7 @@ const Dashboard = () => {
 
   const barChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
     },
@@ -207,7 +209,7 @@ const Dashboard = () => {
         {/* Team Workload */}
         <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 lg:col-span-2 shadow-sm">
           <h2 className="text-lg font-bold text-text-color mb-6">Team Workload (Active Tasks)</h2>
-          <div className="h-64 w-full">
+          <div className="h-64 w-full relative">
             <Bar data={barChartData} options={barChartOptions} />
           </div>
         </div>

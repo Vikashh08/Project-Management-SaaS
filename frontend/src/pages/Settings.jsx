@@ -38,6 +38,7 @@ const Settings = () => {
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
+    avatarUrl: user?.avatarUrl || '',
     bio: user?.bio || '',
     skills: user?.skills?.join(', ') || '',
     experience: user?.experience || '',
@@ -208,8 +209,8 @@ const Settings = () => {
                         <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur opacity-40 group-hover:opacity-70 transition-opacity duration-300"></div>
                         <div className="relative w-28 h-28 rounded-full overflow-hidden ring-4 ring-white dark:ring-gray-800 shadow-xl">
                           <img 
-                            src={user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} 
-                            alt={user?.name || 'Profile'} 
+                            src={profileData.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`} 
+                            alt={profileData.name || 'Profile'} 
                             className="w-full h-full object-cover" 
                           />
                         </div>
@@ -221,19 +222,26 @@ const Settings = () => {
                         </label>
                       </div>
 
-                      <div className="flex flex-col text-center sm:text-left">
+                      <div className="flex flex-col text-center sm:text-left w-full">
                         <h4 className="text-xl font-bold text-text-color">Profile Picture</h4>
-                        <p className="text-sm text-text-muted mt-1 max-w-sm">We recommend an image of at least 256x256px. You can upload a PNG, JPG, WEBP, or GIF (max 5MB).</p>
+                        <p className="text-sm text-text-muted mt-1 max-w-sm">We recommend an image of at least 256x256px. You can upload a file or provide an image URL.</p>
                         {isUploadingAvatar ? (
                           <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-blue-600 font-medium mt-4 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg w-max mx-auto sm:mx-0">
                             <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                             <span>Uploading your photo...</span>
                           </div>
                         ) : (
-                          <div className="mt-4 flex items-center justify-center sm:justify-start gap-3">
-                            <label htmlFor="avatar-input" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm text-text-color border border-border-color">
-                              Change Photo
+                          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 w-full max-w-sm">
+                            <label htmlFor="avatar-input" className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm text-text-color border border-border-color shrink-0">
+                              Upload
                             </label>
+                            <input
+                              type="text"
+                              placeholder="Or paste image URL..."
+                              value={profileData.avatarUrl}
+                              onChange={(e) => setProfileData({...profileData, avatarUrl: e.target.value})}
+                              className="saas-input w-full text-sm py-2"
+                            />
                           </div>
                         )}
                         <input 

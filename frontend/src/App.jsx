@@ -12,6 +12,8 @@ import Calendar from './pages/Calendar';
 import Analytics from './pages/Analytics';
 import Activity from './pages/Activity';
 import Timesheet from './pages/Timesheet';
+import Sprints from './pages/Sprints';
+import Timeline from './pages/Timeline';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -63,6 +65,8 @@ function App() {
                     <Route path="tasks" element={<Tasks />} />
                     <Route path="teams" element={<TeamsPage />} />
                     <Route path="teams/:id" element={<TeamDetails />} />
+                    <Route path="sprints" element={<Sprints />} />
+                    <Route path="timeline" element={<Timeline />} />
                     <Route path="calendar" element={<Calendar />} />
                     <Route path="analytics" element={<Analytics />} />
                     <Route path="activity" element={<Activity />} />

@@ -134,7 +134,6 @@ const Tasks = () => {
   useEffect(() => {
     if (projects.length > 0 && !selectedProjectId) {
       setSelectedProjectId(projects[0].id);
-      setNewTask(prev => ({ ...prev, projectId: projects[0].id }));
     }
   }, [projects, selectedProjectId]);
 
@@ -303,75 +302,161 @@ const Tasks = () => {
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto flex gap-6 pb-6 pt-6">
-        {columns.map((col) => {
-          const columnTasks = tasks.filter(t => t.status === col.id);
-          return (
-            <div key={col.id} className="flex-shrink-0 w-[340px] flex flex-col bg-gray-50/50 dark:bg-gray-800/20 rounded-[2rem] p-4 border border-gray-200/60 dark:border-gray-700/50 shadow-sm">
-              {/* Column Header */}
-              <div className="flex items-center justify-between mb-4 px-2 pt-1">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-3.5 h-3.5 rounded-full shadow-sm border border-black/10 dark:border-white/10" 
-                    style={{ backgroundColor: col.dotColor }}
-                  ></div>
-                  <h3 className="font-extrabold text-gray-800 dark:text-gray-100 text-[16px] tracking-tight">{col.title}</h3>
+      {/* Task Views */}
+      {activeView === 'column' && (
+        <div className="flex-1 overflow-x-auto flex gap-6 pb-6 pt-6 min-h-[300px]">
+          {columns.map((col) => {
+            const columnTasks = tasks.filter(t => t.status === col.id);
+            return (
+              <div key={col.id} className="flex-shrink-0 w-80 sm:w-[340px] flex flex-col bg-gray-50/50 dark:bg-gray-800/20 rounded-[2rem] p-4 border border-gray-200/60 dark:border-gray-700/50 shadow-sm">
+                {/* Column Header */}
+                <div className="flex items-center justify-between mb-4 px-2 pt-1">
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-3.5 h-3.5 rounded-full shadow-sm border border-black/10 dark:border-white/10" 
+                      style={{ backgroundColor: col.dotColor }}
+                    ></div>
+                    <h3 className="font-extrabold text-gray-800 dark:text-gray-100 text-[16px] tracking-tight">{col.title}</h3>
+                  </div>
+                  <span className="flex items-center justify-center min-w-[28px] h-7 px-2.5 text-xs font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm">
+                    {columnTasks.length}
+                  </span>
                 </div>
-                <span className="flex items-center justify-center min-w-[28px] h-7 px-2.5 text-xs font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-sm">
-                  {columnTasks.length}
-                </span>
-              </div>
 
-              {/* Task Cards Drop Zone */}
-              <div 
-                className={`flex-1 overflow-y-auto custom-scrollbar rounded-2xl transition-all duration-300 ease-in-out ${
-                  dragOverColumn === col.id
-                    ? 'ring-2 ring-primary bg-primary/5 scale-[1.02]'
-                    : ''
-                }`}
-                onDragOver={(e) => handleDragOver(e, col.id)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, col.id)}
-              >
-                {isLoading ? (
-                  <Loader />
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="pb-2"
-                  >
-                    {columnTasks.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full min-h-[140px] text-center border-2 border-dashed border-gray-200/60 dark:border-gray-700/60 rounded-2xl m-1 mt-2 bg-white/40 dark:bg-gray-900/40">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3 shadow-inner">
-                          <Plus className="w-5 h-5 text-gray-400" />
+                {/* Task Cards Drop Zone */}
+                <div 
+                  className={`flex-1 overflow-y-auto custom-scrollbar rounded-2xl transition-all duration-300 ease-in-out ${
+                    dragOverColumn === col.id
+                      ? 'ring-2 ring-primary bg-primary/5 scale-[1.02]'
+                      : ''
+                  }`}
+                  onDragOver={(e) => handleDragOver(e, col.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, col.id)}
+                >
+                  {isLoading ? (
+                    <Loader />
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="pb-2"
+                    >
+                      {columnTasks.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full min-h-[140px] text-center border-2 border-dashed border-gray-200/60 dark:border-gray-700/60 rounded-2xl m-1 mt-2 bg-white/40 dark:bg-gray-900/40">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3 shadow-inner">
+                            <Plus className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">No tasks here</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Drag and drop to add</p>
                         </div>
-                        <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">No tasks here</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Drag and drop to add</p>
-                      </div>
-                    ) : (
-                      columnTasks.map((task) => (
-                        <motion.div
-                          key={task.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, task.id)}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          whileHover={{ scale: 1.02 }}
-                          layout
-                        >
-                          <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
-                        </motion.div>
-                      ))
-                    )}
-                  </motion.div>
-                )}
+                      ) : (
+                        columnTasks.map((task) => (
+                          <motion.div
+                            key={task.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, task.id)}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            whileHover={{ scale: 1.02 }}
+                            layout
+                          >
+                            <TaskCard task={task} onClick={() => setSelectedTaskId(task.id)} />
+                          </motion.div>
+                        ))
+                      )}
+                    </motion.div>
+                  )}
+                </div>
               </div>
+            );
+          })}
+        </div>
+      )}
+
+      {activeView === 'grid' && (
+        <div className="flex-1 overflow-y-auto pb-6 pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {isLoading ? <Loader /> : tasks.map(task => (
+              <TaskCard key={task.id} task={task} onClick={() => setSelectedTaskId(task.id)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeView === 'list' && (
+        <div className="flex-1 overflow-y-auto pb-6 pt-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap min-w-[600px]">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700/60">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 font-bold w-1/2">Task Title</th>
+                    <th scope="col" className="px-6 py-4 font-bold">Status</th>
+                    <th scope="col" className="px-6 py-4 font-bold">Priority</th>
+                    <th scope="col" className="px-6 py-4 font-bold">Assignees</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? <tr><td colSpan="4" className="text-center py-8"><Loader /></td></tr> : tasks.map(task => {
+                     const colConfig = columns.find(c => c.id === task.status) || columns[0];
+                     return (
+                    <tr key={task.id} onClick={() => setSelectedTaskId(task.id)} className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white max-w-[200px] sm:max-w-md truncate">
+                        {task.title}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide uppercase" style={{ backgroundColor: `${colConfig.dotColor}20`, color: colConfig.dotColor }}>
+                          {colConfig.title}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <PriorityBadge priority={task.priority} />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex -space-x-2">
+                          {task.assignees?.map((assignee, i) => (
+                             <div key={assignee.id || i} title={assignee.name} className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-900 bg-primary/20 text-primary flex items-center justify-center overflow-hidden text-[10px] font-bold relative z-10" style={{ zIndex: 10 + i }}>
+                                {assignee.avatarUrl ? <img src={assignee.avatarUrl} alt={assignee.name} className="w-full h-full object-cover" /> : assignee.name?.charAt(0)?.toUpperCase()}
+                             </div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )})}
+                </tbody>
+              </table>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      )}
+
+      {activeView === 'row' && (
+        <div className="flex-1 overflow-y-auto pb-6 pt-6 flex flex-col gap-3">
+           {isLoading ? <Loader /> : tasks.map(task => {
+              const colConfig = columns.find(c => c.id === task.status) || columns[0];
+              return (
+              <div key={task.id} onClick={() => setSelectedTaskId(task.id)} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 rounded-xl p-4 cursor-pointer hover:shadow-md hover:border-primary/40 transition-all gap-4">
+                 <div className="flex-1 w-full">
+                   <h4 className="text-[15px] font-bold text-gray-800 dark:text-gray-100 mb-2 sm:mb-0 leading-snug truncate pr-4">{task.title}</h4>
+                 </div>
+                 <div className="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end flex-wrap sm:flex-nowrap">
+                    <PriorityBadge priority={task.priority} />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide uppercase whitespace-nowrap" style={{ backgroundColor: `${colConfig.dotColor}20`, color: colConfig.dotColor }}>
+                      {colConfig.title}
+                    </span>
+                    <div className="flex -space-x-2 hidden sm:flex">
+                        {task.assignees?.map((assignee, i) => (
+                           <div key={assignee.id || i} title={assignee.name} className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-900 bg-primary/20 text-primary flex items-center justify-center overflow-hidden text-[10px] font-bold relative z-10" style={{ zIndex: 10 + i }}>
+                              {assignee.avatarUrl ? <img src={assignee.avatarUrl} alt={assignee.name} className="w-full h-full object-cover" /> : assignee.name?.charAt(0)?.toUpperCase()}
+                           </div>
+                        ))}
+                    </div>
+                 </div>
+              </div>
+           )})}
+        </div>
+      )}
 
       {/* Task Detail Modal */}
       <TaskModal 
