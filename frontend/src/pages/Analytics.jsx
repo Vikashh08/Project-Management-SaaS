@@ -149,7 +149,7 @@ const Analytics = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
           className="saas-card p-6 flex flex-col"
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h2 className="text-lg font-bold text-text-color">Project Burndown</h2>
             <select
               value={selectedProjectId}
@@ -189,7 +189,7 @@ const Analytics = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="saas-card p-6 flex flex-col"
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h2 className="text-lg font-bold text-text-color">Team Velocity</h2>
             <select
               value={selectedTeamId}
@@ -229,7 +229,7 @@ const Analytics = () => {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="saas-card p-6 xl:col-span-2"
         >
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
             <h2 className="text-lg font-bold text-text-color">Time Insights (Project)</h2>
           </div>
           

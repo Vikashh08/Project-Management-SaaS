@@ -1,5 +1,5 @@
-import React from 'react';
-import { Menu, Settings, Download, Home, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Settings, Download, Home, ChevronRight, Moon, Sun } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,15 @@ import { useLocation, Link } from 'react-router';
 const Topbar = ({ onMenuClick, onSearchClick }) => {
   const { user } = useAuth();
   const location = useLocation();
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  const toggleDarkMode = () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    setIsDarkMode(isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  };
 
   // Generate breadcrumbs from current path
   const getBreadcrumbs = () => {
@@ -70,6 +79,14 @@ const Topbar = ({ onMenuClick, onSearchClick }) => {
       
       {/* Right side: Actions */}
       <div className="flex items-center gap-2">
+        <button 
+          onClick={toggleDarkMode}
+          className="p-2 text-text-muted hover:text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          title="Toggle Dark Mode"
+        >
+          {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+
         <button 
           className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-text-muted hover:text-text-color hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           title="Settings"

@@ -53,40 +53,44 @@ const Calendar = () => {
       </div>
 
       <div className="flex-1 bg-surface-color rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
-          {days.map(day => (
-            <div key={day} className="p-4 text-center text-sm font-bold text-text-muted uppercase tracking-wider">
-              {day}
-            </div>
-          ))}
-        </div>
-        
-        {/* Grid */}
-        <div className="grid grid-cols-7 flex-1">
-          {dates.map((date, i) => {
-            const dayNum = date > 31 ? date - 31 : date;
-            const dayTasks = getTasksForDate(dayNum);
-            
-            return (
-              <div 
-                key={i} 
-                className={`border-b border-r border-gray-100 dark:border-gray-800 p-2 min-h-[120px] transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/30 ${i % 7 === 6 ? 'border-r-0' : ''}`}
-              >
-                <span className={`text-sm font-medium w-8 h-8 flex items-center justify-center rounded-full ${date === new Date().getDate() ? 'bg-blue-600 text-white' : 'text-text-muted'}`}>
-                  {dayNum}
-                </span>
-                
-                <div className="mt-1 space-y-1">
-                  {dayTasks.map(task => (
-                    <div key={task.id} className={`px-2 py-1 text-xs rounded truncate font-medium ${getPriorityColor(task.priority)}`} title={task.title}>
-                      {task.title}
-                    </div>
-                  ))}
+        <div className="overflow-x-auto flex-1 custom-scrollbar">
+          <div className="min-w-[700px] h-full flex flex-col">
+            {/* Header */}
+            <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+              {days.map(day => (
+                <div key={day} className="p-4 text-center text-sm font-bold text-text-muted uppercase tracking-wider">
+                  {day}
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+            
+            {/* Grid */}
+            <div className="grid grid-cols-7 flex-1 bg-white dark:bg-[#131b2e]">
+              {dates.map((date, i) => {
+                const dayNum = date > 31 ? date - 31 : date;
+                const dayTasks = getTasksForDate(dayNum);
+                
+                return (
+                  <div 
+                    key={i} 
+                    className={`border-b border-r border-gray-100 dark:border-gray-800 p-2 min-h-[120px] transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/30 ${i % 7 === 6 ? 'border-r-0' : ''}`}
+                  >
+                    <span className={`text-sm font-medium w-8 h-8 flex items-center justify-center rounded-full ${date === new Date().getDate() ? 'bg-blue-600 text-white' : 'text-text-muted'}`}>
+                      {dayNum}
+                    </span>
+                    
+                    <div className="mt-1 space-y-1">
+                      {dayTasks.map(task => (
+                        <div key={task.id} className={`px-2 py-1 text-xs rounded truncate font-medium ${getPriorityColor(task.priority)}`} title={task.title}>
+                          {task.title}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
